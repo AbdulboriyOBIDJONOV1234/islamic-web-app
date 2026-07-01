@@ -42,11 +42,13 @@ export default function DashboardPage() {
       setAllMyEntries(allEntries);
       setStreak(calcStreak(allEntries));
 
-      const partnerUser = allUsers.find((u) => u.id !== userId) || null;
+      const partnerUser = allUsers.find((u) => String(u.id) !== String(userId)) || null;
       setPartner(partnerUser);
       if (partnerUser) {
-        setPartnerEntry(await getEntryByDate(partnerUser.id, todayStr));
+        setPartnerEntry(await getEntryByDate(String(partnerUser.id), todayStr));
       }
+    } catch (err) {
+      console.error('Dashboard load error:', err);
     } finally {
       setLoading(false);
     }

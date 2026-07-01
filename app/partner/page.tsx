@@ -29,18 +29,21 @@ export default function PartnerPage() {
     setError('');
     try {
       const allUsers = await getAllUsers();
-      const partnerUser = allUsers.find((u) => u.id !== myId) || null;
+      const partnerUser = allUsers.find((u) => String(u.id) !== String(myId)) || null;
       setPartner(partnerUser);
       if (partnerUser) {
+        const pid = String(partnerUser.id);
         const [todayEnt, entries] = await Promise.all([
-          getEntryByDate(partnerUser.id, today()),
-          getAllEntries(partnerUser.id),
+          getEntryByDate(pid, today()),
+          getAllEntries(pid),
         ]);
         setTodayEntry(todayEnt);
-        setAllEntries(entries.slice(0, 30));
+        const safeEntries = Array.isArray(entries) ? entries : [];
+        setAllEntries(safeEntries.slice(0, 30));
       }
-    } catch {
-      setError('Ma\'lumotlarni yuklashda xatolik. Qayta urinib ko\'ring.');
+    } catch (err) {
+      console.error('Partner page load error:', err);
+      setError(err instanceof Error ? err.message : 'Ma\'lumotlarni yuklashda xatolik.');
     } finally {
       setLoading(false);
     }
