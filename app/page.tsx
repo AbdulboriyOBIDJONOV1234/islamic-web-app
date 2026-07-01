@@ -30,8 +30,9 @@ export default function LoginPage() {
       }
       setSession({ id: user.id, name: user.name });
       router.push('/dashboard');
-    } catch {
-      setError("Xatolik yuz berdi. Qayta urinib ko'ring.");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(`Xatolik: ${msg}`);
     } finally {
       setLoading(false);
     }
