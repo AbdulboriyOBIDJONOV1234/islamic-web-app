@@ -15,16 +15,17 @@ export default function LoginPage() {
   async function handleLogin() {
     const trimmed = name.trim();
     if (!trimmed) { setError("Ismingizni kiriting"); return; }
+    const ALLOWED = ['abdulboriy', 'mohinur'];
+    if (!ALLOWED.includes(trimmed.toLowerCase())) {
+      setError("Kechirasiz, bu ilova faqat Abdulboriy va Mohinur uchun.");
+      return;
+    }
+
     setLoading(true);
     setError('');
     try {
       let user = await getUserByName(trimmed);
       if (!user) {
-        const all = await getAllUsers();
-        if (all.length >= 2) {
-          setError("Faqat 2 kishi ro'yxatdan o'ta oladi. Ismingizni tekshiring.");
-          return;
-        }
         user = await createUser(trimmed);
       }
       setSession({ id: user.id, name: user.name });
