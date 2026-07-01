@@ -15,9 +15,29 @@ export interface DailyEntry {
   xufton: boolean;
   dhikr_count: number;
   salawat_count: number;
+  subhanallah_count: number;
+  alhamdulillah_count: number;
+  allahu_akbar_count: number;
+  la_ilaha_count: number;
+  astaghfirullah_count: number;
+  salawat_notes: string;
   created_at: string;
   updated_at: string;
 }
+
+export const DHIKR_TYPES = [
+  { key: 'subhanallah_count', label: 'SubhanAlloh', arabic: 'سُبْحَانَ اللَّهِ', suggested: 33 },
+  { key: 'alhamdulillah_count', label: 'Alhamdulilloh', arabic: 'الْحَمْدُ لِلَّهِ', suggested: 33 },
+  { key: 'allahu_akbar_count', label: 'Allohu Akbar', arabic: 'اللَّهُ أَكْبَرُ', suggested: 34 },
+  { key: 'la_ilaha_count', label: 'La ilaha illalloh', arabic: 'لَا إِلَهَ إِلَّا اللَّهُ', suggested: 100 },
+  { key: 'astaghfirullah_count', label: 'Astaghfirulloh', arabic: 'أَسْتَغْفِرُ اللَّهَ', suggested: 100 },
+] as const;
+
+export const SALAWAT_OPTIONS = [
+  { label: 'Allohhumma solli ala Muhammad', arabic: 'اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ' },
+  { label: 'Sallosalloh alayhi wasallam', arabic: 'صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ' },
+  { label: 'Allohhumma solli wa sallim', arabic: 'اللَّهُمَّ صَلِّ وَسَلِّمْ' },
+];
 
 export interface DailyStats {
   date: string;

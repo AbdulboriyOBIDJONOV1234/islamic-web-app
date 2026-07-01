@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUserByName, createUser, getAllUsers } from '@/lib/supabase';
 import { setSession } from '@/lib/utils';
+import Kaaba3D from '@/components/Kaaba3D';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,31 +14,22 @@ export default function LoginPage() {
 
   async function handleLogin() {
     const trimmed = name.trim();
-    if (!trimmed) {
-      setError("Iltimos, ismingizni kiriting");
-      return;
-    }
-
+    if (!trimmed) { setError("Ismingizni kiriting"); return; }
     setLoading(true);
     setError('');
-
     try {
       let user = await getUserByName(trimmed);
-
       if (!user) {
-        const allUsers = await getAllUsers();
-        if (allUsers.length >= 2) {
-          setError("Bu ilovada faqat 2 kishi ro'yxatdan o'ta oladi. Ismingizni tekshiring.");
-          setLoading(false);
+        const all = await getAllUsers();
+        if (all.length >= 2) {
+          setError("Faqat 2 kishi ro'yxatdan o'ta oladi. Ismingizni tekshiring.");
           return;
         }
         user = await createUser(trimmed);
       }
-
       setSession({ id: user.id, name: user.name });
       router.push('/dashboard');
-    } catch (err) {
-      console.error(err);
+    } catch {
       setError("Xatolik yuz berdi. Qayta urinib ko'ring.");
     } finally {
       setLoading(false);
@@ -45,24 +37,31 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 login-bg">
-      <div className="w-full max-w-sm fade-in">
-        <div className="text-center mb-8">
-          <div className="text-6xl mb-3">☽</div>
-          <h1 className="text-3xl font-bold text-white mb-1">بِسْمِ اللَّهِ</h1>
-          <p className="text-green-200 text-sm">Bismillahir Rohmanir Rohiym</p>
+    <div className="min-h-screen login-bg flex flex-col items-center justify-center px-4 relative">
+      <div className="w-full max-w-sm relative z-10 fade-in">
+
+        {/* 3D Kaaba */}
+        <div className="mb-6">
+          <Kaaba3D />
         </div>
 
-        <div className="bg-white rounded-3xl p-8 shadow-2xl">
-          <h2 className="text-2xl font-bold text-center mb-1 login-title">
-            Namoz Tracker
-          </h2>
-          <p className="text-gray-500 text-center text-sm mb-8">
-            Kunlik namoz, zikr va salovotlaringizni kuzating
+        {/* Title */}
+        <div className="text-center mb-6">
+          <h1 className="text-4xl font-black gold-text mb-1">بِسْمِ اللَّهِ</h1>
+          <p className="text-green-300 text-xs tracking-widest uppercase">
+            Bismillahir Rohmanir Rohiym
+          </p>
+        </div>
+
+        {/* Glass card */}
+        <div className="card-glass p-7">
+          <h2 className="text-xl font-bold text-white text-center mb-1">Namoz Tracker</h2>
+          <p className="text-green-300 text-xs text-center mb-6">
+            Kunlik namoz · Zikr · Salovat
           </p>
 
-          <div className="mb-6">
-            <label className="block text-sm font-semibold mb-2 text-green-800">
+          <div className="mb-4">
+            <label className="block text-xs font-semibold mb-2 text-green-300 uppercase tracking-wider">
               Ismingiz
             </label>
             <input
@@ -77,34 +76,26 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <div className="mb-4 p-3 rounded-xl text-sm text-red-700 bg-red-50 border border-red-200">
+            <div className="mb-4 p-3 rounded-xl text-xs text-red-200 bg-red-900/30 border border-red-500/30">
               {error}
             </div>
           )}
 
-          <button
-            type="button"
-            onClick={handleLogin}
-            disabled={loading || !name.trim()}
-            className="btn-primary"
-          >
-            {loading ? '⏳ Yuklanmoqda...' : 'Kirish →'}
+          <button type="button" onClick={handleLogin} disabled={loading || !name.trim()} className="btn-primary">
+            {loading ? '⏳ Yuklanmoqda...' : '✦ Kirish'}
           </button>
 
-          <div className="mt-6 pt-6 border-t border-gray-100">
-            <p className="text-center text-xs text-gray-400">
-              Yangi foydalanuvchi bo&apos;lsangiz avtomatik ro&apos;yxatdan o&apos;tasiz
-            </p>
-          </div>
+          <p className="text-center text-xs text-green-400/60 mt-4">
+            Yangi foydalanuvchi avtomatik ro&apos;yxatdan o&apos;tadi
+          </p>
         </div>
 
-        <div className="mt-6 text-center">
-          <p className="text-green-100 font-medium text-lg arabic-text">
+        {/* Salawat footer */}
+        <div className="text-center mt-6">
+          <p className="text-xl gold-salawat">
             اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ
           </p>
-          <p className="mt-1 text-xs text-green-200 opacity-80">
-            Allohhumma solli ala Muhammad ﷺ
-          </p>
+          <p className="text-green-400/60 text-xs mt-1">Allohhumma solli ala Muhammad ﷺ</p>
         </div>
       </div>
     </div>

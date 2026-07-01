@@ -1,59 +1,179 @@
 @import "tailwindcss";
 
+/* ===================== DESIGN TOKENS ===================== */
 :root {
+  --green-deep: #0a2e1a;
   --green-primary: #1a6b3c;
-  --green-dark: #0f4a28;
+  --green-light: #16a34a;
   --gold: #d4a017;
+  --gold-light: #f0c040;
   --cream: #faf8f2;
+  --card-bg: rgba(255,255,255,0.95);
 }
 
 body {
-  background-color: #faf8f2;
+  background: var(--cream);
   font-family: 'Segoe UI', system-ui, sans-serif;
   color: #1a1a1a;
 }
 
-.arabic-text {
-  direction: rtl;
-  text-align: center;
+/* ===================== 3D KAABA ===================== */
+.kaaba-scene {
+  perspective: 500px;
+  width: 110px;
+  height: 110px;
+  margin: 0 auto;
 }
 
+.kaaba-wrap {
+  width: 110px;
+  height: 110px;
+  animation: kaaba-float 4s ease-in-out infinite;
+}
+
+.kaaba-cube {
+  width: 110px;
+  height: 110px;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: kaaba-rotate 18s linear infinite;
+}
+
+.k-face {
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  background: #0d0d0d;
+  border: 2px solid #d4a017;
+  overflow: hidden;
+}
+
+.k-front  { transform: rotateY(0deg)   translateZ(55px); }
+.k-back   { transform: rotateY(180deg) translateZ(55px); }
+.k-left   { transform: rotateY(-90deg) translateZ(55px); }
+.k-right  { transform: rotateY(90deg)  translateZ(55px); }
+.k-top    { transform: rotateX(90deg)  translateZ(55px); background: #111; }
+.k-bottom { transform: rotateX(-90deg) translateZ(55px); background: #0a0a0a; }
+
+.k-band {
+  position: absolute;
+  top: 30%;
+  left: 0;
+  right: 0;
+  height: 28%;
+  background: linear-gradient(180deg, #d4a017 0%, #8b6914 50%, #d4a017 100%);
+  opacity: 0.85;
+}
+
+.k-door {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 38px;
+  background: linear-gradient(180deg, #d4a017, #a07010);
+  border-radius: 14px 14px 0 0;
+  box-shadow: 0 0 10px rgba(212, 160, 23, 0.6);
+}
+
+@keyframes kaaba-rotate {
+  from { transform: rotateY(0deg); }
+  to   { transform: rotateY(360deg); }
+}
+
+@keyframes kaaba-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-12px); }
+}
+
+/* ===================== BACKGROUNDS ===================== */
+.login-bg {
+  background: linear-gradient(160deg, #061a0e 0%, #0f4a28 40%, #1a6b3c 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 20% 15%, rgba(212,160,23,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 80% 25%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 50% 60%, rgba(212,160,23,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 10% 70%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 80%, rgba(212,160,23,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 35% 45%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 65% 35%, rgba(212,160,23,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 75% 90%, rgba(255,255,255,0.4) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.page-bg {
+  background: linear-gradient(180deg, #f0f7f2 0%, #faf8f2 100%);
+  min-height: 100vh;
+}
+
+.header-bg {
+  background: linear-gradient(135deg, #061a0e 0%, #0f4a28 60%, #1a6b3c 100%);
+}
+
+/* ===================== CARDS ===================== */
 .card {
   background: white;
-  border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-  border: 1px solid rgba(26, 107, 60, 0.08);
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+  border: 1px solid rgba(26,107,60,0.08);
 }
 
+.card-glass {
+  background: rgba(255,255,255,0.12);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(212,160,23,0.3);
+  border-radius: 20px;
+}
+
+.card-gold {
+  background: linear-gradient(135deg, rgba(212,160,23,0.15), rgba(212,160,23,0.05));
+  border: 1px solid rgba(212,160,23,0.4);
+  border-radius: 16px;
+}
+
+/* ===================== BUTTONS ===================== */
 .btn-primary {
   background: linear-gradient(135deg, #1a6b3c, #0f4a28);
   color: white;
-  border-radius: 12px;
-  padding: 12px 24px;
-  font-weight: 600;
+  border-radius: 14px;
+  padding: 14px 24px;
+  font-weight: 700;
+  font-size: 16px;
   transition: all 0.2s;
   border: none;
   cursor: pointer;
   width: 100%;
-  font-size: 16px;
+  box-shadow: 0 4px 15px rgba(26,107,60,0.3);
 }
 
 .btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(26, 107, 60, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(26,107,60,0.4);
 }
 
 .btn-primary:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
+/* ===================== PRAYER BUTTONS ===================== */
 .prayer-btn {
-  border-radius: 12px;
-  padding: 14px 8px;
-  font-size: 13px;
-  font-weight: 600;
+  border-radius: 14px;
+  padding: 12px 6px;
+  font-size: 12px;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
   border: none;
@@ -63,49 +183,130 @@ body {
 .prayer-active {
   background: linear-gradient(135deg, #1a6b3c, #16a34a);
   color: white;
-  box-shadow: 0 4px 12px rgba(26, 107, 60, 0.3);
+  box-shadow: 0 4px 15px rgba(26,107,60,0.35);
+  transform: scale(1.03);
 }
 
 .prayer-inactive {
-  background: #f0f0f0;
-  color: #888;
-  border: 2px dashed #ddd;
+  background: #f3f4f6;
+  color: #9ca3af;
+  border: 2px dashed #d1d5db;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+/* ===================== INPUTS ===================== */
+.input-name {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid rgba(212,160,23,0.3);
+  border-radius: 14px;
+  font-size: 18px;
+  outline: none;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  transition: border-color 0.2s;
 }
 
-.fade-in {
-  animation: fadeIn 0.35s ease-out;
+.input-name::placeholder { color: rgba(255,255,255,0.4); }
+
+.input-name:focus,
+.input-name.has-value {
+  border-color: #d4a017;
+  background: rgba(255,255,255,0.15);
 }
 
-/* Navigation */
+.number-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 24px;
+  font-weight: 700;
+  outline: none;
+  text-align: center;
+  color: #1a6b3c;
+  background: #f0faf4;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+
+.number-input:focus { border-color: #1a6b3c; }
+
+.quick-btn {
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1.5px solid #d1fae5;
+  background: #f0faf4;
+  color: #1a6b3c;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.quick-btn:hover {
+  background: #1a6b3c;
+  color: white;
+}
+
+.quick-btn-sm {
+  font-size: 10px;
+  padding: 2px 6px;
+}
+
+.dhikr-input {
+  width: 80px;
+  padding: 8px 10px;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  color: #1a6b3c;
+  background: #f0faf4;
+  outline: none;
+}
+
+.dhikr-input:focus { border-color: #1a6b3c; }
+
+/* ===================== NAVIGATION ===================== */
 .nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  padding: 6px 14px;
+  padding: 6px 12px;
   border-radius: 12px;
-  font-size: 11px;
-  font-weight: 500;
+  font-size: 10px;
+  font-weight: 600;
   transition: all 0.2s;
   text-decoration: none;
+  color: #9ca3af;
 }
 
 .nav-item-active {
-  background: rgba(26, 107, 60, 0.1);
+  background: rgba(26,107,60,0.12);
   color: #1a6b3c;
-  font-weight: 700;
 }
 
-.nav-item-inactive {
-  color: #888;
+/* ===================== DHIKR CARD ===================== */
+.dhikr-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f3f4f6;
 }
 
-/* Statistics */
+.dhikr-row:last-child { border-bottom: none; }
+
+.dhikr-arabic {
+  direction: rtl;
+  font-size: 14px;
+  color: #6b7280;
+  text-align: right;
+}
+
+/* ===================== PROGRESS ===================== */
 .progress-bar {
   height: 6px;
   border-radius: 3px;
@@ -117,72 +318,43 @@ body {
   height: 100%;
   border-radius: 3px;
   background: linear-gradient(90deg, #1a6b3c, #16a34a);
-  transition: width 0.5s ease;
+  transition: width 0.6s ease;
   width: var(--progress-width, 0%);
 }
 
-/* Login page */
-.login-bg {
-  background: linear-gradient(160deg, #0f4a28 0%, #1a6b3c 50%, #1e8449 100%);
+/* ===================== ANIMATIONS ===================== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.login-title {
-  color: #0f4a28;
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
 }
 
-.input-name {
-  width: 100%;
-  padding: 12px 16px;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
-  font-size: 18px;
-  outline: none;
-  background: #faf8f2;
-  transition: border-color 0.2s;
+.fade-in { animation: fadeIn 0.4s ease-out; }
+
+.gold-text {
+  background: linear-gradient(90deg, #d4a017, #f0c040, #d4a017);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
 }
 
-.input-name:focus,
-.input-name.has-value {
-  border-color: #1a6b3c;
-}
+/* ===================== LOGIN ===================== */
+.login-title { color: #0f4a28; }
 
-/* Entry page */
-.entry-bg {
-  background: #faf8f2;
-}
+/* ===================== ENTRY ===================== */
+.entry-bg { background: linear-gradient(180deg, #f0f7f2 0%, #faf8f2 100%); }
 
-.number-input {
-  flex: 1;
-  padding: 12px 16px;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
-  font-size: 28px;
-  font-weight: 700;
-  outline: none;
-  text-align: center;
-  transition: border-color 0.2s;
-  color: #1a6b3c;
-  background: #f0faf4;
-}
+.gold-salawat { color: #f0c040; }
+.btn-entry-link { background: linear-gradient(135deg, #1a6b3c, #0f4a28); }
+.gold-arabic { color: #d4a017; direction: rtl; }
 
-.number-input:focus {
-  border-color: #1a6b3c;
-}
-
-.quick-btn {
-  padding: 6px 12px;
-  border-radius: 8px;
-  border: 1.5px solid #d1fae5;
-  background: #f0faf4;
-  color: #1a6b3c;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.quick-btn:hover {
-  background: #1a6b3c;
-  color: white;
-  border-color: #1a6b3c;
-}
+/* ===================== STAT MINI ===================== */
+.stat-mini-green  { background: #f0fdf4; color: #166534; }
+.stat-mini-gold   { background: #fffbeb; color: #92400e; }
+.stat-mini-purple { background: #faf5ff; color: #6b21a8; }

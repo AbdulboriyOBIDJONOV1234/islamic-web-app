@@ -38,22 +38,37 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { userId, date, bomdod, peshin, asr, shom, xufton, dhikr_count, salawat_count } = body;
+  const {
+    userId, date,
+    bomdod, peshin, asr, shom, xufton,
+    dhikr_count, salawat_count,
+    subhanallah_count, alhamdulillah_count, allahu_akbar_count,
+    la_ilaha_count, astaghfirullah_count, salawat_notes,
+  } = body;
 
   const rows = await sql`
     INSERT INTO daily_entries
-      (user_id, date, bomdod, peshin, asr, shom, xufton, dhikr_count, salawat_count, updated_at)
+      (user_id, date, bomdod, peshin, asr, shom, xufton,
+       dhikr_count, salawat_count,
+       subhanallah_count, alhamdulillah_count, allahu_akbar_count,
+       la_ilaha_count, astaghfirullah_count, salawat_notes,
+       updated_at)
     VALUES
       (${userId}, ${date}, ${bomdod}, ${peshin}, ${asr}, ${shom}, ${xufton},
-       ${dhikr_count}, ${salawat_count}, NOW())
+       ${dhikr_count}, ${salawat_count},
+       ${subhanallah_count ?? 0}, ${alhamdulillah_count ?? 0}, ${allahu_akbar_count ?? 0},
+       ${la_ilaha_count ?? 0}, ${astaghfirullah_count ?? 0}, ${salawat_notes ?? ''},
+       NOW())
     ON CONFLICT (user_id, date) DO UPDATE SET
-      bomdod = EXCLUDED.bomdod,
-      peshin = EXCLUDED.peshin,
-      asr = EXCLUDED.asr,
-      shom = EXCLUDED.shom,
-      xufton = EXCLUDED.xufton,
-      dhikr_count = EXCLUDED.dhikr_count,
-      salawat_count = EXCLUDED.salawat_count,
+      bomdod = EXCLUDED.bomdod, peshin = EXCLUDED.peshin,
+      asr = EXCLUDED.asr, shom = EXCLUDED.shom, xufton = EXCLUDED.xufton,
+      dhikr_count = EXCLUDED.dhikr_count, salawat_count = EXCLUDED.salawat_count,
+      subhanallah_count = EXCLUDED.subhanallah_count,
+      alhamdulillah_count = EXCLUDED.alhamdulillah_count,
+      allahu_akbar_count = EXCLUDED.allahu_akbar_count,
+      la_ilaha_count = EXCLUDED.la_ilaha_count,
+      astaghfirullah_count = EXCLUDED.astaghfirullah_count,
+      salawat_notes = EXCLUDED.salawat_notes,
       updated_at = NOW()
     RETURNING *
   `;
