@@ -181,6 +181,60 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Kitob o'qish */}
+        {(myEntry?.morning_pages || myEntry?.evening_pages) ? (
+          <div className="card p-5">
+            <h3 className="font-bold text-gray-800 mb-3">📚 Bugungi o&apos;qish</h3>
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              <div className="bg-amber-50 rounded-xl p-3 text-center">
+                <div className="text-2xl font-black text-amber-700">{myEntry.morning_pages}</div>
+                <div className="text-xs text-amber-600 mt-1">🌅 Ertalab</div>
+              </div>
+              <div className="bg-indigo-50 rounded-xl p-3 text-center">
+                <div className="text-2xl font-black text-indigo-700">{myEntry.evening_pages}</div>
+                <div className="text-xs text-indigo-600 mt-1">🌙 Kechqurun</div>
+              </div>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-3 text-center">
+              <span className="text-sm font-bold text-gray-700">
+                Jami: {(myEntry.morning_pages || 0) + (myEntry.evening_pages || 0)} sahifa
+              </span>
+              {myEntry.book_name && (
+                <p className="text-xs text-gray-400 mt-0.5">📖 {myEntry.book_name}</p>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="card p-4 flex items-center justify-between">
+            <div>
+              <p className="font-semibold text-gray-700 text-sm">📚 Bugun kitob o&apos;qidingizmi?</p>
+              <p className="text-xs text-gray-400">Ertalab & kechqurun sahifalarni kiriting</p>
+            </div>
+            <a href="/entry" className="text-xs bg-amber-500 text-white px-3 py-2 rounded-xl font-bold">+ Qo&apos;sh</a>
+          </div>
+        )}
+
+        {/* Hamkor kitob */}
+        {partner && (partnerEntry?.morning_pages || partnerEntry?.evening_pages) && (
+          <div className="card p-4">
+            <p className="font-bold text-gray-800 text-sm mb-2">📚 {partner.name} — bugungi o&apos;qish</p>
+            <div className="flex gap-3">
+              <span className="text-xs bg-amber-50 text-amber-700 px-3 py-1.5 rounded-lg font-bold">
+                🌅 {partnerEntry?.morning_pages || 0} sahifa
+              </span>
+              <span className="text-xs bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg font-bold">
+                🌙 {partnerEntry?.evening_pages || 0} sahifa
+              </span>
+              <span className="text-xs bg-gray-50 text-gray-600 px-3 py-1.5 rounded-lg font-bold">
+                Jami: {(partnerEntry?.morning_pages || 0) + (partnerEntry?.evening_pages || 0)}
+              </span>
+            </div>
+            {partnerEntry?.book_name && (
+              <p className="text-xs text-gray-400 mt-2">📖 {partnerEntry.book_name}</p>
+            )}
+          </div>
+        )}
+
         {/* Salawat */}
         <div className="card-gold p-5 text-center">
           <p className="text-2xl mb-1 gold-arabic">

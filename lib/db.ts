@@ -1,4 +1,11 @@
 import { neon } from '@neondatabase/serverless';
 
-const sql = neon(process.env.DATABASE_URL!);
-export default sql;
+let _sql: ReturnType<typeof neon> | null = null;
+
+export default function getDb() {
+  if (_sql) return _sql;
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error('DATABASE_URL is not set');
+  _sql = neon(url);
+  return _sql;
+}

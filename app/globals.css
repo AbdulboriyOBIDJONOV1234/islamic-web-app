@@ -253,6 +253,21 @@ body {
   padding: 2px 6px;
 }
 
+.book-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #fde68a;
+  border-radius: 12px;
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  color: #92400e;
+  background: #fffbeb;
+  outline: none;
+}
+
+.book-input:focus { border-color: #f59e0b; }
+
 .dhikr-input {
   width: 80px;
   padding: 8px 10px;

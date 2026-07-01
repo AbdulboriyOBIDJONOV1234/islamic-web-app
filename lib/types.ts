@@ -21,6 +21,9 @@ export interface DailyEntry {
   la_ilaha_count: number;
   astaghfirullah_count: number;
   salawat_notes: string;
+  morning_pages: number;
+  evening_pages: number;
+  book_name: string;
   created_at: string;
   updated_at: string;
 }

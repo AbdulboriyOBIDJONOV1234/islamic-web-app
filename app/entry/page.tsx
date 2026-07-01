@@ -26,6 +26,9 @@ export default function EntryPage() {
   const [salawatCount, setSalawatCount] = useState('');
   const [salawatNotes, setSalawatNotes] = useState('');
   const [customSalawat, setCustomSalawat] = useState('');
+  const [morningPages, setMorningPages] = useState('');
+  const [eveningPages, setEveningPages] = useState('');
+  const [bookName, setBookName] = useState('');
   const [existingEntry, setExistingEntry] = useState<DailyEntry | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -54,6 +57,9 @@ export default function EntryPage() {
         });
         setSalawatCount(entry.salawat_count > 0 ? String(entry.salawat_count) : '');
         setSalawatNotes(entry.salawat_notes || '');
+        setMorningPages(entry.morning_pages > 0 ? String(entry.morning_pages) : '');
+        setEveningPages(entry.evening_pages > 0 ? String(entry.evening_pages) : '');
+        setBookName(entry.book_name || '');
       }
     } finally {
       setLoading(false);
@@ -87,6 +93,9 @@ export default function EntryPage() {
         salawat_count: parseInt(salawatCount) || 0,
         ...dhikr,
         salawat_notes: salawatNotes,
+        morning_pages: parseInt(morningPages) || 0,
+        evening_pages: parseInt(eveningPages) || 0,
+        book_name: bookName.trim(),
       });
       setSaved(true);
       setTimeout(() => router.push('/dashboard'), 1200);
@@ -260,6 +269,79 @@ export default function EntryPage() {
               </div>
             )}
           </div>
+        </div>
+
+        {/* === KITOB O'QISH === */}
+        <div className="card p-5">
+          <h2 className="font-black text-gray-800 mb-1">📚 Kitob o&apos;qish</h2>
+          <p className="text-xs text-gray-400 mb-4">
+            Ertalab bomdoddan keyin · Kechqurun yotishdan oldin
+          </p>
+
+          {/* Book name */}
+          <div className="mb-4">
+            <label className="text-xs font-semibold text-gray-600 mb-2 block">
+              Qaysi kitob? (ixtiyoriy)
+            </label>
+            <input
+              type="text"
+              value={bookName}
+              onChange={(e) => setBookName(e.target.value)}
+              placeholder="Kitob nomi..."
+              className="w-full px-3 py-2 border-2 border-gray-100 rounded-xl text-sm outline-none focus:border-amber-400 bg-amber-50/30"
+            />
+          </div>
+
+          {/* Morning + Evening */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-semibold text-amber-700 mb-2 block flex items-center gap-1">
+                🌅 Ertalab (sahifa)
+              </label>
+              <input
+                type="number" min="0" max="999"
+                value={morningPages}
+                onChange={(e) => setMorningPages(e.target.value)}
+                placeholder="0"
+                className="book-input"
+              />
+              <div className="flex gap-1 mt-1">
+                {[5, 10, 20].map((n) => (
+                  <button type="button" key={n}
+                    onClick={() => setMorningPages(String(n))}
+                    className="quick-btn quick-btn-sm">{n}</button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-indigo-700 mb-2 block flex items-center gap-1">
+                🌙 Kechqurun (sahifa)
+              </label>
+              <input
+                type="number" min="0" max="999"
+                value={eveningPages}
+                onChange={(e) => setEveningPages(e.target.value)}
+                placeholder="0"
+                className="book-input"
+              />
+              <div className="flex gap-1 mt-1">
+                {[5, 10, 20].map((n) => (
+                  <button type="button" key={n}
+                    onClick={() => setEveningPages(String(n))}
+                    className="quick-btn quick-btn-sm">{n}</button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {(parseInt(morningPages) || 0) + (parseInt(eveningPages) || 0) > 0 && (
+            <div className="mt-3 p-3 bg-amber-50 rounded-xl text-center">
+              <p className="text-amber-800 font-bold text-sm">
+                📖 Jami: {(parseInt(morningPages) || 0) + (parseInt(eveningPages) || 0)} sahifa
+              </p>
+              {bookName && <p className="text-xs text-amber-600 mt-0.5">{bookName}</p>}
+            </div>
+          )}
         </div>
 
         {/* === SAQLASH === */}
