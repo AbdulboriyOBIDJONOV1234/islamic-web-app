@@ -17,75 +17,7 @@ body {
   color: #1a1a1a;
 }
 
-/* ===================== 3D KAABA ===================== */
-.kaaba-scene {
-  perspective: 500px;
-  width: 110px;
-  height: 110px;
-  margin: 0 auto;
-}
-
-.kaaba-wrap {
-  width: 110px;
-  height: 110px;
-  animation: kaaba-float 4s ease-in-out infinite;
-}
-
-.kaaba-cube {
-  width: 110px;
-  height: 110px;
-  position: relative;
-  transform-style: preserve-3d;
-  animation: kaaba-rotate 18s linear infinite;
-}
-
-.k-face {
-  position: absolute;
-  width: 110px;
-  height: 110px;
-  background: #0d0d0d;
-  border: 2px solid #d4a017;
-  overflow: hidden;
-}
-
-.k-front  { transform: rotateY(0deg)   translateZ(55px); }
-.k-back   { transform: rotateY(180deg) translateZ(55px); }
-.k-left   { transform: rotateY(-90deg) translateZ(55px); }
-.k-right  { transform: rotateY(90deg)  translateZ(55px); }
-.k-top    { transform: rotateX(90deg)  translateZ(55px); background: #111; }
-.k-bottom { transform: rotateX(-90deg) translateZ(55px); background: #0a0a0a; }
-
-.k-band {
-  position: absolute;
-  top: 30%;
-  left: 0;
-  right: 0;
-  height: 28%;
-  background: linear-gradient(180deg, #d4a017 0%, #8b6914 50%, #d4a017 100%);
-  opacity: 0.85;
-}
-
-.k-door {
-  position: absolute;
-  bottom: 10%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 28px;
-  height: 38px;
-  background: linear-gradient(180deg, #d4a017, #a07010);
-  border-radius: 14px 14px 0 0;
-  box-shadow: 0 0 10px rgba(212, 160, 23, 0.6);
-}
-
-@keyframes kaaba-rotate {
-  from { transform: rotateY(0deg); }
-  to   { transform: rotateY(360deg); }
-}
-
-@keyframes kaaba-float {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-12px); }
-}
+/* 3D Kaaba olib tashlandi — tezlik uchun */
 
 /* ===================== BACKGROUNDS ===================== */
 .login-bg {
