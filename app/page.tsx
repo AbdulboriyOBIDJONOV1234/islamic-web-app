@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { setSession } from '@/lib/utils';
 
 type Step = 'name' | 'login' | 'register';
+type Eye = 'password' | 'text';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -12,6 +13,7 @@ export default function LoginPage() {
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
+  const [showPass, setShowPass] = useState<Eye>('password');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -118,7 +120,7 @@ export default function LoginPage() {
                   value={name}
                   onChange={(e) => { setName(e.target.value); setError(''); }}
                   onKeyDown={(e) => e.key === 'Enter' && handleNameNext()}
-                  placeholder="Abdulboriy yoki Mohinur"
+                  placeholder="Ismingizni kiriting..."
                   className={`input-name ${name ? 'has-value' : ''}`}
                   autoFocus
                 />
@@ -173,21 +175,28 @@ export default function LoginPage() {
                 <label className="text-xs font-semibold text-green-300 uppercase tracking-wider block mb-2">
                   Yangi parol
                 </label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => { setPassword(e.target.value); setError(''); }}
-                  placeholder="Kamida 4 ta belgi"
-                  className={`input-name ${password ? 'has-value' : ''}`}
-                  autoFocus
-                />
+                <div className="relative">
+                  <input
+                    type={showPass}
+                    value={password}
+                    onChange={(e) => { setPassword(e.target.value); setError(''); }}
+                    placeholder="Kamida 4 ta belgi"
+                    className={`input-name ${password ? 'has-value' : ''}`}
+                    autoFocus
+                  />
+                  <button type="button"
+                    onClick={() => setShowPass(showPass === 'password' ? 'text' : 'password')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 text-lg">
+                    {showPass === 'password' ? '👁' : '🙈'}
+                  </button>
+                </div>
               </div>
               <div>
                 <label className="text-xs font-semibold text-green-300 uppercase tracking-wider block mb-2">
                   Parolni tasdiqlang
                 </label>
                 <input
-                  type="password"
+                  type={showPass}
                   value={confirm}
                   onChange={(e) => { setConfirm(e.target.value); setError(''); }}
                   onKeyDown={(e) => e.key === 'Enter' && handleRegister()}
