@@ -1,26 +1,188 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --green-primary: #1a6b3c;
+  --green-dark: #0f4a28;
+  --gold: #d4a017;
+  --cream: #faf8f2;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #faf8f2;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  color: #1a1a1a;
+}
+
+.arabic-text {
+  direction: rtl;
+  text-align: center;
+}
+
+.card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  border: 1px solid rgba(26, 107, 60, 0.08);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #1a6b3c, #0f4a28);
+  color: white;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-weight: 600;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  font-size: 16px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(26, 107, 60, 0.3);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.prayer-btn {
+  border-radius: 12px;
+  padding: 14px 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  text-align: center;
+}
+
+.prayer-active {
+  background: linear-gradient(135deg, #1a6b3c, #16a34a);
+  color: white;
+  box-shadow: 0 4px 12px rgba(26, 107, 60, 0.3);
+}
+
+.prayer-inactive {
+  background: #f0f0f0;
+  color: #888;
+  border: 2px dashed #ddd;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.35s ease-out;
+}
+
+/* Navigation */
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 14px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.nav-item-active {
+  background: rgba(26, 107, 60, 0.1);
+  color: #1a6b3c;
+  font-weight: 700;
+}
+
+.nav-item-inactive {
+  color: #888;
+}
+
+/* Statistics */
+.progress-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #1a6b3c, #16a34a);
+  transition: width 0.5s ease;
+  width: var(--progress-width, 0%);
+}
+
+/* Login page */
+.login-bg {
+  background: linear-gradient(160deg, #0f4a28 0%, #1a6b3c 50%, #1e8449 100%);
+}
+
+.login-title {
+  color: #0f4a28;
+}
+
+.input-name {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 18px;
+  outline: none;
+  background: #faf8f2;
+  transition: border-color 0.2s;
+}
+
+.input-name:focus,
+.input-name.has-value {
+  border-color: #1a6b3c;
+}
+
+/* Entry page */
+.entry-bg {
+  background: #faf8f2;
+}
+
+.number-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 28px;
+  font-weight: 700;
+  outline: none;
+  text-align: center;
+  transition: border-color 0.2s;
+  color: #1a6b3c;
+  background: #f0faf4;
+}
+
+.number-input:focus {
+  border-color: #1a6b3c;
+}
+
+.quick-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1.5px solid #d1fae5;
+  background: #f0faf4;
+  color: #1a6b3c;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.quick-btn:hover {
+  background: #1a6b3c;
+  color: white;
+  border-color: #1a6b3c;
 }

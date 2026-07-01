@@ -1,0 +1,169 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Navigation from '@/components/Navigation';
+import { getSession, today, formatDisplayDate, countPrayers, getMissedPrayers } from '@/lib/utils';
+import { getEntryByDate, getAllUsers, getAllEntries } from '@/lib/supabase';
+import type { DailyEntry, User } from '@/lib/types';
+import { PRAYERS } from '@/lib/types';
+
+export default function PartnerPage() {
+  const router = useRouter();
+  const [user, setUser] = useState<{ id: string; name: string } | null>(null);
+  const [partner, setPartner] = useState<User | null>(null);
+  const [todayEntry, setTodayEntry] = useState<DailyEntry | null>(null);
+  const [allEntries, setAllEntries] = useState<DailyEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const session = getSession();
+    if (!session) { router.replace('/'); return; }
+    setUser(session);
+    loadData(session.id);
+  }, [router]);
+
+  async function loadData(myId: string) {
+    setLoading(true);
+    try {
+      const allUsers = await getAllUsers();
+      const partnerUser = allUsers.find((u) => u.id !== myId) || null;
+      setPartner(partnerUser);
+      if (partnerUser) {
+        const [todayEnt, entries] = await Promise.all([
+          getEntryByDate(partnerUser.id, today()),
+          getAllEntries(partnerUser.id),
+        ]);
+        setTodayEntry(todayEnt);
+        setAllEntries(entries.slice(0, 30));
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center login-bg">
+        <div className="text-white text-xl">⏳ Yuklanmoqda...</div>
+      </div>
+    );
+  }
+
+  if (!partner) {
+    return (
+      <div className="min-h-screen pb-28" style={{ background: '#faf8f2' }}>
+        <div className="login-bg text-white px-4 pt-10 pb-16">
+          <div className="max-w-md mx-auto">
+            <h1 className="text-2xl font-bold">👤 Hamkor</h1>
+          </div>
+        </div>
+        <div className="max-w-md mx-auto px-4 -mt-8">
+          <div className="card p-8 text-center">
+            <div className="text-5xl mb-4">🌙</div>
+            <h2 className="font-bold text-gray-700 text-lg mb-2">Hamkor hali yo&apos;q</h2>
+            <p className="text-gray-400 text-sm">
+              Ikkinchi kishi ro&apos;yxatdan o&apos;tishi kutilmoqda
+            </p>
+          </div>
+        </div>
+        <Navigation />
+      </div>
+    );
+  }
+
+  const prayersDone = countPrayers(todayEntry);
+  const prayersMissed = getMissedPrayers(todayEntry);
+
+  return (
+    <div className="min-h-screen pb-28" style={{ background: '#faf8f2' }}>
+      <div className="login-bg text-white px-4 pt-10 pb-16">
+        <div className="max-w-md mx-auto">
+          <p className="text-green-200 text-sm mb-1">Hamkoringiz</p>
+          <h1 className="text-2xl font-bold">{partner.name} 👤</h1>
+          <p className="text-green-200 text-xs mt-1">
+            Faqat ko&apos;rish mumkin • Tahrirlash cheklangan
+          </p>
+        </div>
+      </div>
+
+      <div className="max-w-md mx-auto px-4 -mt-8 space-y-4 fade-in">
+        {/* Today */}
+        <div className="card p-5">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="font-bold text-gray-800">Bugun — {formatDisplayDate(today())}</h2>
+            <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
+              todayEntry ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-400'
+            }`}>
+              {todayEntry ? 'Kiritilgan ✓' : 'Kiritilmagan'}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-5 gap-2 mb-4">
+            {PRAYERS.map((p) => {
+              const done = todayEntry ? todayEntry[p.key] : false;
+              return (
+                <div key={p.key} className={`prayer-btn ${done ? 'prayer-active' : 'prayer-inactive'}`}>
+                  <div className="text-xs font-bold">{p.label}</div>
+                  <div className="text-xl mt-1">{done ? '✓' : '○'}</div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <StatBox label="Namoz" value={`${prayersDone}/5`} />
+            <StatBox label="Zikr" value={todayEntry?.dhikr_count ?? '—'} />
+            <StatBox label="Salovat" value={todayEntry?.salawat_count ?? '—'} />
+          </div>
+
+          {prayersMissed > 0 && todayEntry && (
+            <p className="mt-3 text-xs text-red-500 text-center">⚠️ {prayersMissed} ta namoz qoldirildi</p>
+          )}
+        </div>
+
+        {/* History */}
+        {allEntries.length > 0 && (
+          <div className="card p-5">
+            <h2 className="font-bold text-gray-800 mb-4">📋 So&apos;nggi 30 kun</h2>
+            <div className="space-y-2 max-h-96 overflow-y-auto">
+              {allEntries.map((entry) => {
+                const done = countPrayers(entry);
+                const missed = getMissedPrayers(entry);
+                return (
+                  <div key={entry.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-700">{formatDisplayDate(entry.date)}</p>
+                      <p className="text-xs text-gray-400">
+                        Zikr: {entry.dhikr_count} · Salovat: {entry.salawat_count}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <span className={`text-sm font-bold ${done === 5 ? 'text-green-600' : missed > 2 ? 'text-red-500' : 'text-orange-500'}`}>
+                        {done}/5
+                      </span>
+                      {missed > 0 && (
+                        <p className="text-xs text-red-400">{missed} qoldirildi</p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <Navigation />
+    </div>
+  );
+}
+
+function StatBox({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="bg-gray-50 rounded-xl p-3 text-center">
+      <div className="text-xl font-bold text-gray-800">{value}</div>
+      <div className="text-xs text-gray-400 mt-1">{label}</div>
+    </div>
+  );
+}
