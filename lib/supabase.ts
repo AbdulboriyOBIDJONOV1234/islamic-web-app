@@ -1,59 +1,41 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import type { User, DailyEntry } from './types';
 
-let _client: SupabaseClient | null = null;
+const base = typeof window !== 'undefined' ? '' : (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000');
 
-function getClient(): SupabaseClient {
-  if (_client) return _client;
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) throw new Error('Supabase env variables are not set');
-  _client = createClient(url, key);
-  return _client;
+async function get<T>(path: string): Promise<T> {
+  const res = await fetch(`${base}${path}`, { cache: 'no-store' });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+async function post<T>(path: string, body: unknown): Promise<T> {
+  const res = await fetch(`${base}${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
 }
 
 // --- User functions ---
 
 export async function getAllUsers(): Promise<User[]> {
-  const { data, error } = await getClient()
-    .from('users')
-    .select('*')
-    .order('created_at', { ascending: true });
-  if (error) throw error;
-  return data || [];
+  return get<User[]>('/api/users');
 }
 
 export async function getUserByName(name: string): Promise<User | null> {
-  const { data, error } = await getClient()
-    .from('users')
-    .select('*')
-    .ilike('name', name)
-    .single();
-  if (error) return null;
-  return data;
+  return get<User | null>(`/api/users?name=${encodeURIComponent(name)}`);
 }
 
 export async function createUser(name: string): Promise<User> {
-  const { data, error } = await getClient()
-    .from('users')
-    .insert({ name: name.trim() })
-    .select()
-    .single();
-  if (error) throw error;
-  return data;
+  return post<User>('/api/users', { name });
 }
 
 // --- Entry functions ---
 
 export async function getEntryByDate(userId: string, date: string): Promise<DailyEntry | null> {
-  const { data, error } = await getClient()
-    .from('daily_entries')
-    .select('*')
-    .eq('user_id', userId)
-    .eq('date', date)
-    .single();
-  if (error) return null;
-  return data;
+  return get<DailyEntry | null>(`/api/entries?userId=${userId}&date=${date}`);
 }
 
 export async function upsertEntry(
@@ -61,21 +43,7 @@ export async function upsertEntry(
   date: string,
   entry: Partial<DailyEntry>
 ): Promise<DailyEntry> {
-  const { data, error } = await getClient()
-    .from('daily_entries')
-    .upsert(
-      {
-        user_id: userId,
-        date,
-        ...entry,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'user_id,date' }
-    )
-    .select()
-    .single();
-  if (error) throw error;
-  return data;
+  return post<DailyEntry>('/api/entries', { userId, date, ...entry });
 }
 
 export async function getEntriesByRange(
@@ -83,23 +51,9 @@ export async function getEntriesByRange(
   startDate: string,
   endDate: string
 ): Promise<DailyEntry[]> {
-  const { data, error } = await getClient()
-    .from('daily_entries')
-    .select('*')
-    .eq('user_id', userId)
-    .gte('date', startDate)
-    .lte('date', endDate)
-    .order('date', { ascending: true });
-  if (error) throw error;
-  return data || [];
+  return get<DailyEntry[]>(`/api/entries?userId=${userId}&start=${startDate}&end=${endDate}`);
 }
 
 export async function getAllEntries(userId: string): Promise<DailyEntry[]> {
-  const { data, error } = await getClient()
-    .from('daily_entries')
-    .select('*')
-    .eq('user_id', userId)
-    .order('date', { ascending: false });
-  if (error) throw error;
-  return data || [];
+  return get<DailyEntry[]>(`/api/entries?userId=${userId}&all=true`);
 }
