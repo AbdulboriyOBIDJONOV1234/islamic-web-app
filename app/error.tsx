@@ -18,8 +18,11 @@ export default function GlobalError({
       <div className="card-glass p-8 max-w-sm w-full text-center">
         <div className="text-5xl mb-4">⚠️</div>
         <h2 className="text-white font-black text-xl mb-2">Sahifa yuklanmadi</h2>
-        <p className="text-green-300 text-sm mb-6">
+        <p className="text-green-300 text-sm mb-4">
           Tarmoq muammosi yoki sahifa xatosi. Qayta urinib ko&apos;ring.
+        </p>
+        <p className="text-red-300 text-xs bg-black/30 p-2 rounded-lg mb-4 font-mono text-left break-all">
+          {error?.message || 'Noma\'lum xato'}
         </p>
         <button
           type="button"
