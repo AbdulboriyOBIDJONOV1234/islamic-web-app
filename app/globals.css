@@ -305,3 +305,223 @@ body {
 .stat-mini-green  { background: #f0fdf4; color: #166534; }
 .stat-mini-gold   { background: #fffbeb; color: #92400e; }
 .stat-mini-purple { background: #faf5ff; color: #6b21a8; }
+
+/* ===================== STREAK ===================== */
+.streak-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 160, 0, 0.15);
+  border: 1px solid rgba(255, 160, 0, 0.35);
+  border-radius: 12px;
+  padding: 8px 14px;
+  color: #ffd060;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ===================== NIYAT ===================== */
+.niyat-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid #e5e7eb;
+  border-radius: 14px;
+  font-size: 14px;
+  outline: none;
+  background: #f9fafb;
+  color: #1a1a1a;
+  resize: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+
+.niyat-input:focus { border-color: #1a6b3c; background: #f0faf4; }
+
+.niyat-input::placeholder { color: #9ca3af; }
+
+/* ===================== BADGES ===================== */
+.badge-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  transition: all 0.15s;
+}
+
+.badge-earned {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.badge-locked {
+  background: #f9fafb;
+  border: 1px solid #f3f4f6;
+  opacity: 0.7;
+}
+
+/* ===================== GOAL FILL ===================== */
+.goal-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.6s ease;
+  width: var(--goal-width, 0%);
+}
+
+.goal-fill-green   { background: #16a34a; }
+.goal-fill-teal    { background: #0d9488; }
+.goal-fill-emerald { background: #10b981; }
+.goal-fill-amber   { background: #f59e0b; }
+
+.goal-number-input {
+  width: 100px;
+  padding: 8px 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  color: #1a6b3c;
+  background: #f0faf4;
+  outline: none;
+}
+
+.goal-number-input:focus { border-color: #1a6b3c; }
+
+/* ===================== CALENDAR HEATMAP ===================== */
+.heat-cell {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.heat-month-label {
+  font-size: 8px;
+  color: #9ca3af;
+  text-align: center;
+  overflow: hidden;
+}
+
+.heat-empty { background: transparent; }
+.heat-none  { background: #e5e7eb; }
+.heat-1     { background: #bbf7d0; }
+.heat-3     { background: #4ade80; }
+.heat-5     { background: #15803d; }
+
+/* ===================== QURAN PAGE ===================== */
+.quran-progress-bar {
+  height: 10px;
+  border-radius: 5px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+
+.quran-progress-fill {
+  height: 100%;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #1a6b3c, #22c55e);
+  transition: width 0.6s ease;
+  width: var(--progress-width, 0%);
+}
+
+.surah-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 4px;
+}
+
+.surah-cell {
+  aspect-ratio: 1;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+}
+
+.surah-done {
+  background: #15803d;
+  color: white;
+  transform: scale(1.05);
+}
+
+.surah-undone {
+  background: #f3f4f6;
+  color: #9ca3af;
+}
+
+.surah-undone:hover { background: #d1fae5; color: #15803d; }
+
+.surah-legend-done {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background: #15803d;
+}
+
+.surah-legend-undone {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+}
+
+.popular-surah-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+}
+
+.popular-surah-done   { background: #f0fdf4; border: 1.5px solid #86efac; }
+.popular-surah-undone { background: #f9fafb; border: 1.5px solid #e5e7eb; }
+
+.popular-surah-undone:hover { background: #f0fdf4; }
+
+/* ===================== DUA CHECKLIST ===================== */
+.dua-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  width: 100%;
+  border: none;
+  text-align: left;
+}
+
+.dua-done   { background: #f0fdf4; }
+.dua-undone { background: #f9fafb; border: 1px solid #f3f4f6; }
+.dua-undone:hover { background: #f0fdf4; }
+
+.dua-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 900;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.dua-check-done   { background: #15803d; color: white; }
+.dua-check-indigo { background: #6366f1; color: white; }
+.dua-check-undone { background: #e5e7eb; color: transparent; border: 2px solid #d1d5db; }

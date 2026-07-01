@@ -1,13 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Navigation from '@/components/Navigation';
-import { getSession, clearSession, today, formatDisplayDate, countPrayers, getMissedPrayers } from '@/lib/utils';
-import { getEntryByDate, getAllUsers } from '@/lib/supabase';
+import {
+  getSession, clearSession, today, formatDisplayDate,
+  countPrayers, getMissedPrayers, calcStreak, calcBadges,
+} from '@/lib/utils';
+import { getEntryByDate, getAllUsers, getAllEntries } from '@/lib/supabase';
+import { getNiyat, setNiyat, getGoals, getNotifEnabled, setNotifEnabled } from '@/lib/local';
 import type { DailyEntry, User } from '@/lib/types';
 import { PRAYERS } from '@/lib/types';
+import { format } from 'date-fns';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -15,24 +20,28 @@ export default function DashboardPage() {
   const [partner, setPartner] = useState<User | null>(null);
   const [myEntry, setMyEntry] = useState<DailyEntry | null>(null);
   const [partnerEntry, setPartnerEntry] = useState<DailyEntry | null>(null);
+  const [allMyEntries, setAllMyEntries] = useState<DailyEntry[]>([]);
+  const [streak, setStreak] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [niyat, setNiyatState] = useState('');
+  const [notifOn, setNotifOn] = useState(false);
+  const [showBadges, setShowBadges] = useState(false);
+  const [showGoals, setShowGoals] = useState(false);
+  const [yearMonth] = useState(() => format(new Date(), 'yyyy-MM'));
 
-  useEffect(() => {
-    const session = getSession();
-    if (!session) { router.replace('/'); return; }
-    setUser(session);
-    loadData(session.id);
-  }, [router]);
-
-  async function loadData(userId: string) {
+  const loadData = useCallback(async (userId: string) => {
     setLoading(true);
     try {
       const todayStr = today();
-      const [entry, allUsers] = await Promise.all([
+      const [entry, allUsers, allEntries] = await Promise.all([
         getEntryByDate(userId, todayStr),
         getAllUsers(),
+        getAllEntries(userId),
       ]);
       setMyEntry(entry);
+      setAllMyEntries(allEntries);
+      setStreak(calcStreak(allEntries));
+
       const partnerUser = allUsers.find((u) => u.id !== userId) || null;
       setPartner(partnerUser);
       if (partnerUser) {
@@ -40,6 +49,69 @@ export default function DashboardPage() {
       }
     } finally {
       setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const session = getSession();
+    if (!session) { router.replace('/'); return; }
+    setUser(session);
+    loadData(session.id);
+    setNiyatState(getNiyat(session.id, today()));
+    setNotifOn(getNotifEnabled(session.id));
+  }, [router, loadData]);
+
+  function handleNiyatSave(text: string) {
+    if (!user) return;
+    setNiyatState(text);
+    setNiyat(user.id, today(), text);
+  }
+
+  async function toggleNotif() {
+    if (!user) return;
+    if (!notifOn) {
+      const perm = await Notification.requestPermission();
+      if (perm !== 'granted') {
+        alert('Bildirishnomaga ruxsat berilmadi. Brauzer sozlamalaridan ruxsat bering.');
+        return;
+      }
+      setNotifEnabled(user.id, true);
+      setNotifOn(true);
+      new Notification('✅ Namoz Tracker', {
+        body: 'Namoz vaqti kelganda xabar beriladi!',
+        icon: '/favicon.ico',
+      });
+      scheduleNextPrayer();
+    } else {
+      setNotifEnabled(user.id, false);
+      setNotifOn(false);
+    }
+  }
+
+  function scheduleNextPrayer() {
+    const prayerTimes = [
+      { name: 'Bomdod', hour: 5, min: 0 },
+      { name: 'Peshin', hour: 13, min: 0 },
+      { name: 'Asr', hour: 16, min: 30 },
+      { name: "Shom", hour: 19, min: 30 },
+      { name: 'Xufton', hour: 21, min: 0 },
+    ];
+    const now = new Date();
+    const nowMins = now.getHours() * 60 + now.getMinutes();
+    for (const p of prayerTimes) {
+      const pMins = p.hour * 60 + p.min;
+      if (pMins > nowMins) {
+        const delay = (pMins - nowMins) * 60 * 1000;
+        setTimeout(() => {
+          if (Notification.permission === 'granted') {
+            new Notification(`🕌 ${p.name} namozi vaqti!`, {
+              body: 'Namoz vaqti keldi. Alloh qabul qilsin!',
+              icon: '/favicon.ico',
+            });
+          }
+        }, delay);
+        break;
+      }
     }
   }
 
@@ -62,20 +134,53 @@ export default function DashboardPage() {
       (myEntry.astaghfirullah_count || 0)
     : 0;
 
+  const badges = calcBadges(allMyEntries, streak);
+  const earnedBadges = badges.filter((b) => b.earned);
+
+  const goals = getGoals(user?.id || '', yearMonth);
+  const monthDhikr = allMyEntries
+    .filter((e) => e.date.startsWith(yearMonth))
+    .reduce((s, e) => s + (e.dhikr_count || 0) + (e.subhanallah_count || 0) + (e.alhamdulillah_count || 0) + (e.allahu_akbar_count || 0) + (e.la_ilaha_count || 0) + (e.astaghfirullah_count || 0), 0);
+  const monthSalawat = allMyEntries
+    .filter((e) => e.date.startsWith(yearMonth))
+    .reduce((s, e) => s + (e.salawat_count || 0), 0);
+  const monthPages = allMyEntries
+    .filter((e) => e.date.startsWith(yearMonth))
+    .reduce((s, e) => s + (e.morning_pages || 0) + (e.evening_pages || 0), 0);
+  const monthNamoz5 = allMyEntries
+    .filter((e) => e.date.startsWith(yearMonth) && countPrayers(e) === 5).length;
+
   return (
     <div className="min-h-screen pb-28 page-bg">
       {/* Header */}
       <div className="header-bg text-white px-4 pt-10 pb-20">
-        <div className="max-w-md mx-auto flex justify-between items-start">
-          <div>
-            <p className="text-green-400 text-xs uppercase tracking-widest mb-1">Assalomu alaykum</p>
-            <h1 className="text-2xl font-black">{user?.name} ✦</h1>
-            <p className="text-green-400 text-xs mt-1">{formatDisplayDate(todayStr)}</p>
+        <div className="max-w-md mx-auto">
+          <div className="flex justify-between items-start mb-3">
+            <div>
+              <p className="text-green-400 text-xs uppercase tracking-widest mb-1">Assalomu alaykum</p>
+              <h1 className="text-2xl font-black">{user?.name} ✦</h1>
+              <p className="text-green-400 text-xs mt-1">{formatDisplayDate(todayStr)}</p>
+            </div>
+            <div className="flex flex-col items-end gap-2">
+              <button type="button" onClick={() => { clearSession(); router.push('/'); }}
+                className="text-green-400 text-xs border border-green-800 px-3 py-1 rounded-full hover:bg-green-900/50">
+                Chiqish
+              </button>
+              <button type="button" onClick={toggleNotif}
+                className={`text-xs border px-3 py-1 rounded-full transition-all ${notifOn ? 'bg-green-700 text-white border-green-600' : 'text-green-400 border-green-800 hover:bg-green-900/50'}`}>
+                {notifOn ? '🔔 Yoq' : '🔕 Eslatma'}
+              </button>
+            </div>
           </div>
-          <button type="button" onClick={() => { clearSession(); router.push('/'); }}
-            className="text-green-400 text-xs border border-green-800 px-3 py-1 rounded-full hover:bg-green-900/50">
-            Chiqish
-          </button>
+
+          {/* Streak banner */}
+          {streak > 0 && (
+            <div className="streak-banner">
+              <span className="text-lg">🔥</span>
+              <span className="font-black">{streak} kunlik streak!</span>
+              <span className="text-xs opacity-80">5/5 namoz ketma-ket</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -116,12 +221,75 @@ export default function DashboardPage() {
             <p className="text-xs text-red-500 text-center">⚠️ {myMissed} ta namoz qoldirildi</p>
           )}
           {myDone === 5 && (
-            <p className="text-xs text-green-600 text-center font-semibold">🎉 Barcha namozlar o'qildi!</p>
+            <p className="text-xs text-green-600 text-center font-semibold">🎉 Barcha namozlar o&apos;qildi!</p>
           )}
           {!myEntry && (
-            <p className="text-xs text-gray-400 text-center">Bugungi ma'lumot hali kiritilmagan</p>
+            <p className="text-xs text-gray-400 text-center">Bugungi ma&apos;lumot hali kiritilmagan</p>
           )}
         </div>
+
+        {/* Kunlik niyat */}
+        <div className="card p-5">
+          <h3 className="font-bold text-gray-800 mb-3">📝 Bugungi niyat</h3>
+          <textarea
+            value={niyat}
+            onChange={(e) => handleNiyatSave(e.target.value)}
+            placeholder="Bugungi niyatingizni yozing... (faqat siz ko'rasiz)"
+            className="niyat-input"
+            rows={2}
+          />
+          {niyat && <p className="text-xs text-green-600 mt-1 text-right">✓ Saqlandi</p>}
+        </div>
+
+        {/* Badges & Goals toggles */}
+        <div className="grid grid-cols-2 gap-3">
+          <button type="button" onClick={() => setShowBadges(!showBadges)}
+            className="card p-4 text-center hover:shadow-md transition-all">
+            <div className="text-2xl mb-1">🏆</div>
+            <div className="text-sm font-bold text-gray-700">Yutuqlar</div>
+            <div className="text-xs text-green-600">{earnedBadges.length}/{badges.length} olindi</div>
+          </button>
+          <button type="button" onClick={() => setShowGoals(!showGoals)}
+            className="card p-4 text-center hover:shadow-md transition-all">
+            <div className="text-2xl mb-1">🎯</div>
+            <div className="text-sm font-bold text-gray-700">Oylik maqsad</div>
+            <div className="text-xs text-blue-600">{monthNamoz5}/{goals.namoz} kun</div>
+          </button>
+        </div>
+
+        {/* Badges panel */}
+        {showBadges && (
+          <div className="card p-5">
+            <h3 className="font-bold text-gray-800 mb-4">🏆 Yutuqlar (Badges)</h3>
+            <div className="grid grid-cols-1 gap-2">
+              {badges.map((b) => (
+                <div key={b.id}
+                  className={`badge-row ${b.earned ? 'badge-earned' : 'badge-locked'}`}>
+                  <span className="text-xl w-8 text-center">{b.earned ? b.icon : '🔒'}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm font-bold ${b.earned ? 'text-gray-800' : 'text-gray-400'}`}>{b.name}</p>
+                    <p className="text-xs text-gray-400 truncate">{b.desc}</p>
+                  </div>
+                  {b.earned && <span className="text-green-500 text-xs font-bold flex-shrink-0">✓ Olindi</span>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Goals panel */}
+        {showGoals && (
+          <div className="card p-5">
+            <h3 className="font-bold text-gray-800 mb-4">🎯 Oylik maqsad ({yearMonth})</h3>
+            <div className="space-y-3">
+              <GoalRow label="🕌 5/5 Namoz kunlar" current={monthNamoz5} target={goals.namoz} unit="kun" color="green" />
+              <GoalRow label="📿 Zikr" current={monthDhikr} target={goals.dhikr} unit="" color="teal" />
+              <GoalRow label="💚 Salovat" current={monthSalawat} target={goals.salawat} unit="" color="emerald" />
+              <GoalRow label="📚 Sahifalar" current={monthPages} target={goals.pages} unit="sahifa" color="amber" />
+            </div>
+            <p className="text-xs text-gray-400 text-center mt-3">Maqsadlarni &quot;Qur&apos;on&quot; sahifasida o&apos;zgartiring</p>
+          </div>
+        )}
 
         {/* Partner card */}
         {partner && (
@@ -129,7 +297,7 @@ export default function DashboardPage() {
             <div className="flex justify-between items-center mb-4">
               <div>
                 <h2 className="font-bold text-gray-800">{partner.name}</h2>
-                <p className="text-xs text-gray-400">Bugungi holat • faqat ko'rish</p>
+                <p className="text-xs text-gray-400">Bugungi holat • faqat ko&apos;rish</p>
               </div>
               <span className={`text-xs px-3 py-1 rounded-full font-bold ${partnerEntry ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-400'}`}>
                 {partnerEntry ? '✓ Kiritilgan' : 'Kutilmoqda'}
@@ -210,11 +378,11 @@ export default function DashboardPage() {
               <p className="font-semibold text-gray-700 text-sm">📚 Bugun kitob o&apos;qidingizmi?</p>
               <p className="text-xs text-gray-400">Ertalab & kechqurun sahifalarni kiriting</p>
             </div>
-            <a href="/entry" className="text-xs bg-amber-500 text-white px-3 py-2 rounded-xl font-bold">+ Qo&apos;sh</a>
+            <Link href="/entry" className="text-xs bg-amber-500 text-white px-3 py-2 rounded-xl font-bold">+ Qo&apos;sh</Link>
           </div>
         )}
 
-        {/* Hamkor kitob */}
+        {/* Partner kitob */}
         {partner && (partnerEntry?.morning_pages || partnerEntry?.evening_pages) && (
           <div className="card p-4">
             <p className="font-bold text-gray-800 text-sm mb-2">📚 {partner.name} — bugungi o&apos;qish</p>
@@ -246,6 +414,22 @@ export default function DashboardPage() {
           </p>
         </div>
 
+        {/* Quick links */}
+        <div className="grid grid-cols-2 gap-3">
+          <Link href="/quran"
+            className="card p-4 text-center hover:shadow-md transition-all no-underline block">
+            <div className="text-2xl mb-1">📖</div>
+            <div className="text-sm font-bold text-gray-700">Qur&apos;on & Duolar</div>
+            <div className="text-xs text-gray-400">Suralari • Azkorlar</div>
+          </Link>
+          <Link href="/statistics"
+            className="card p-4 text-center hover:shadow-md transition-all no-underline block">
+            <div className="text-2xl mb-1">📅</div>
+            <div className="text-sm font-bold text-gray-700">Kalendar</div>
+            <div className="text-xs text-gray-400">90 kunlik jadval</div>
+          </Link>
+        </div>
+
       </div>
       <Navigation />
     </div>
@@ -257,6 +441,31 @@ function StatChip({ label, value, cls }: { label: string; value: string | number
     <div className={`rounded-xl p-3 text-center ${cls}`}>
       <div className="text-lg font-black">{value}</div>
       <div className="text-xs mt-0.5 opacity-70">{label}</div>
+    </div>
+  );
+}
+
+function GoalFill({ pct, color }: { pct: number; color: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    ref.current?.style.setProperty('--goal-width', `${pct}%`);
+  }, [pct]);
+  return <div className={`goal-fill goal-fill-${color}`} ref={ref} />;
+}
+
+function GoalRow({ label, current, target, unit, color }: {
+  label: string; current: number; target: number; unit: string; color: string;
+}) {
+  const pct = Math.min(100, target > 0 ? Math.round((current / target) * 100) : 0);
+  return (
+    <div>
+      <div className="flex justify-between text-xs mb-1">
+        <span className="text-gray-600 font-medium">{label}</span>
+        <span className="font-bold text-gray-800">{current.toLocaleString()}/{target.toLocaleString()} {unit} ({pct}%)</span>
+      </div>
+      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+        <GoalFill pct={pct} color={color} />
+      </div>
     </div>
   );
 }

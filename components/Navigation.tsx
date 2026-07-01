@@ -4,9 +4,10 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const links = [
-  { href: '/dashboard', icon: '🕌', label: 'Bosh sahifa' },
-  { href: '/entry', icon: '📝', label: 'Kiritish' },
+  { href: '/dashboard', icon: '🕌', label: 'Bugun' },
+  { href: '/entry', icon: '✏️', label: 'Kiritish' },
   { href: '/statistics', icon: '📊', label: 'Statistika' },
+  { href: '/quran', icon: '📖', label: 'Diniy' },
   { href: '/partner', icon: '👤', label: 'Hamkor' },
 ];
 
@@ -22,7 +23,7 @@ export default function Navigation() {
             href={link.href}
             className={`nav-item ${pathname === link.href ? 'nav-item-active' : 'nav-item-inactive'}`}
           >
-            <span className="text-2xl">{link.icon}</span>
+            <span className="text-xl">{link.icon}</span>
             <span>{link.label}</span>
           </Link>
         ))}

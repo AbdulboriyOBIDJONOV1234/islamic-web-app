@@ -93,3 +93,62 @@ export function setSession(user: { id: string; name: string }) {
 export function clearSession() {
   localStorage.removeItem('namoz_user');
 }
+
+export function calcStreak(entries: DailyEntry[]): number {
+  if (!entries.length) return 0;
+  const entryMap = new Map(entries.map((e) => [e.date, e]));
+  const todayStr = today();
+
+  let checkDate = todayStr;
+  // If today doesn't have 5/5, start streak check from yesterday
+  const todayEntry = entryMap.get(todayStr);
+  if (!todayEntry || countPrayers(todayEntry) < 5) {
+    const d = new Date(todayStr + 'T00:00:00');
+    d.setDate(d.getDate() - 1);
+    checkDate = formatDate(d);
+  }
+
+  let streak = 0;
+  while (true) {
+    const entry = entryMap.get(checkDate);
+    if (!entry || countPrayers(entry) < 5) break;
+    streak++;
+    const d = new Date(checkDate + 'T00:00:00');
+    d.setDate(d.getDate() - 1);
+    checkDate = formatDate(d);
+  }
+  return streak;
+}
+
+export interface Badge {
+  id: string;
+  icon: string;
+  name: string;
+  desc: string;
+  earned: boolean;
+}
+
+export function calcBadges(entries: DailyEntry[], streak: number): Badge[] {
+  const totalDhikr = entries.reduce((s, e) => s + (e.dhikr_count || 0) + (e.subhanallah_count || 0) + (e.alhamdulillah_count || 0) + (e.allahu_akbar_count || 0) + (e.la_ilaha_count || 0) + (e.astaghfirullah_count || 0), 0);
+  const totalSalawat = entries.reduce((s, e) => s + (e.salawat_count || 0), 0);
+  const totalPages = entries.reduce((s, e) => s + (e.morning_pages || 0) + (e.evening_pages || 0), 0);
+  const daysWithAll5 = entries.filter((e) => countPrayers(e) === 5).length;
+  const maxDhikrDay = entries.reduce((max, e) => {
+    const d = (e.dhikr_count || 0) + (e.subhanallah_count || 0) + (e.alhamdulillah_count || 0) + (e.allahu_akbar_count || 0) + (e.la_ilaha_count || 0) + (e.astaghfirullah_count || 0);
+    return Math.max(max, d);
+  }, 0);
+
+  return [
+    { id: 'first', icon: '🌱', name: 'Birinchi qadam', desc: 'Birinchi marotaba ma\'lumot kiriting', earned: entries.length > 0 },
+    { id: 'streak3', icon: '🔥', name: '3 kunlik streak', desc: '3 kun ketma-ket 5/5 namoz', earned: streak >= 3 },
+    { id: 'streak7', icon: '🔥🔥', name: '7 kunlik streak', desc: '7 kun ketma-ket 5/5 namoz', earned: streak >= 7 },
+    { id: 'streak30', icon: '⚡', name: '30 kunlik streak', desc: '30 kun ketma-ket 5/5 namoz', earned: streak >= 30 },
+    { id: 'all5_10', icon: '🕌', name: 'Namozchi', desc: '10 kun 5/5 namoz o\'qish', earned: daysWithAll5 >= 10 },
+    { id: 'all5_25', icon: '🕌✨', name: 'Komil Namozchi', desc: '25 kun 5/5 namoz o\'qish', earned: daysWithAll5 >= 25 },
+    { id: 'dhikr1000', icon: '📿', name: 'Zikrchi', desc: 'Bir kunda 1000+ zikr', earned: maxDhikrDay >= 1000 },
+    { id: 'dhikr_total', icon: '💎', name: 'Zikr Ustasi', desc: 'Jami 10,000+ zikr', earned: totalDhikr >= 10000 },
+    { id: 'salawat500', icon: '💚', name: 'Salovat Chimp', desc: 'Jami 3000+ salovat', earned: totalSalawat >= 3000 },
+    { id: 'pages100', icon: '📚', name: 'O\'quvchi', desc: 'Jami 100+ sahifa o\'qish', earned: totalPages >= 100 },
+    { id: 'pages500', icon: '📚✨', name: 'Kitobxon', desc: 'Jami 500+ sahifa o\'qish', earned: totalPages >= 500 },
+  ];
+}

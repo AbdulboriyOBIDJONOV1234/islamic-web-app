@@ -1,18 +1,106 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   LineChart, Line, CartesianGrid, Legend,
 } from 'recharts';
+
+function ProgressFill({ pct }: { pct: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    ref.current?.style.setProperty('--progress-width', `${pct}%`);
+  }, [pct]);
+  return <div className="progress-fill" ref={ref} />;
+}
 import Navigation from '@/components/Navigation';
 import { getSession, today, getMonthRange, getYearRange, buildChartData, calcTotals, formatDisplayDate } from '@/lib/utils';
-import { getEntriesByRange, getAllUsers } from '@/lib/supabase';
+import { getEntriesByRange, getAllUsers, getAllEntries } from '@/lib/supabase';
 import type { DailyEntry, User } from '@/lib/types';
-import { format, subDays } from 'date-fns';
+import { format, subDays, eachDayOfInterval } from 'date-fns';
 
 type Period = 'week' | 'month' | 'year';
+
+function CalendarHeatmap({ entries }: { entries: DailyEntry[] }) {
+  const entryMap = new Map(entries.map((e) => [e.date, e]));
+  const endDate = new Date();
+  const startDate = subDays(endDate, 89);
+  const days = eachDayOfInterval({ start: startDate, end: endDate });
+
+  const weeks: Date[][] = [];
+  let week: Date[] = [];
+  // Pad start to Sunday
+  const firstDay = days[0].getDay();
+  for (let i = 0; i < firstDay; i++) week.push(new Date(0));
+  for (const day of days) {
+    week.push(day);
+    if (day.getDay() === 6) { weeks.push(week); week = []; }
+  }
+  if (week.length > 0) weeks.push(week);
+
+  function colorFor(date: Date): string {
+    if (date.getTime() === 0) return 'heat-empty';
+    const key = format(date, 'yyyy-MM-dd');
+    const entry = entryMap.get(key);
+    if (!entry) return 'heat-none';
+    const n = [entry.bomdod, entry.peshin, entry.asr, entry.shom, entry.xufton].filter(Boolean).length;
+    if (n === 5) return 'heat-5';
+    if (n >= 3) return 'heat-3';
+    if (n >= 1) return 'heat-1';
+    return 'heat-none';
+  }
+
+  const monthLabels: { label: string; col: number }[] = [];
+  let lastMonth = -1;
+  weeks.forEach((w, wi) => {
+    const firstReal = w.find((d) => d.getTime() !== 0);
+    if (firstReal) {
+      const m = firstReal.getMonth();
+      if (m !== lastMonth) { monthLabels.push({ label: format(firstReal, 'MMM'), col: wi }); lastMonth = m; }
+    }
+  });
+
+  return (
+    <div className="card p-5">
+      <h3 className="font-bold text-gray-800 mb-1">📅 Kalendar (90 kun)</h3>
+      <p className="text-xs text-gray-400 mb-3">Har bir kvadrat — bir kun</p>
+
+      {/* Month labels */}
+      <div className="flex gap-1 mb-1">
+        {weeks.map((_, wi) => {
+          const lbl = monthLabels.find((m) => m.col === wi);
+          return <div key={wi} className="heat-cell heat-month-label">{lbl?.label || ''}</div>;
+        })}
+      </div>
+
+      {/* Grid: weeks as columns, days as rows */}
+      <div className="flex gap-1">
+        {weeks.map((week, wi) => (
+          <div key={wi} className="flex flex-col gap-1">
+            {week.map((day, di) => (
+              <div
+                key={di}
+                className={`heat-cell ${colorFor(day)}`}
+                title={day.getTime() !== 0 ? format(day, 'yyyy-MM-dd') : ''}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+
+      {/* Legend */}
+      <div className="flex items-center gap-2 mt-3 justify-end">
+        <span className="text-xs text-gray-400">Kam</span>
+        <div className="heat-cell heat-none" />
+        <div className="heat-cell heat-1" />
+        <div className="heat-cell heat-3" />
+        <div className="heat-cell heat-5" />
+        <span className="text-xs text-gray-400">Ko&apos;p</span>
+      </div>
+    </div>
+  );
+}
 
 function calcBookTotals(entries: DailyEntry[]) {
   const totalMorning = entries.reduce((s, e) => s + (e.morning_pages || 0), 0);
@@ -30,6 +118,7 @@ export default function StatisticsPage() {
   const [period, setPeriod] = useState<Period>('month');
   const [myEntries, setMyEntries] = useState<DailyEntry[]>([]);
   const [partnerEntries, setPartnerEntries] = useState<DailyEntry[]>([]);
+  const [allMyEntries, setAllMyEntries] = useState<DailyEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -48,11 +137,13 @@ export default function StatisticsPage() {
     setLoading(true);
     try {
       const { start, end } = getRange(p);
-      const [me, allUsers] = await Promise.all([
+      const [me, allUsers, all90] = await Promise.all([
         getEntriesByRange(userId, start, end),
         getAllUsers(),
+        getAllEntries(userId),
       ]);
       setMyEntries(me);
+      setAllMyEntries(all90);
       const partnerUser = allUsers.find((u) => u.id !== userId) || null;
       setPartner(partnerUser);
       if (partnerUser) {
@@ -235,6 +326,8 @@ export default function StatisticsPage() {
               </div>
             )}
 
+            <CalendarHeatmap entries={allMyEntries} />
+
             <p className="text-center text-xs text-gray-400 pb-2">
               {formatDisplayDate(start)} — {formatDisplayDate(end)}
             </p>
@@ -268,8 +361,7 @@ function SummaryCard({ name, totals, book }: {
             Namoz: {totals.avgNamoz.toFixed(0)}%
           </div>
           <div className="progress-bar">
-            <div className="progress-fill"
-              style={{ '--progress-width': `${totals.avgNamoz}%` } as React.CSSProperties} />
+            <ProgressFill pct={totals.avgNamoz} />
           </div>
         </div>
       </div>
