@@ -71,23 +71,27 @@ export default function DashboardPage() {
 
   async function toggleNotif() {
     if (!user) return;
-    if (!notifOn) {
-      const perm = await Notification.requestPermission();
-      if (perm !== 'granted') {
-        alert('Bildirishnomaga ruxsat berilmadi. Brauzer sozlamalaridan ruxsat bering.');
-        return;
-      }
-      setNotifEnabled(user.id, true);
-      setNotifOn(true);
-      new Notification('✅ Namoz Tracker', {
-        body: 'Namoz vaqti kelganda xabar beriladi!',
-        icon: '/favicon.ico',
-      });
-      scheduleNextPrayer();
-    } else {
+    if (typeof window === 'undefined' || !('Notification' in window)) {
+      alert('Brauzeringiz bildirishnomalarni qo\'llab-quvvatlamaydi.\n\nTavsiya: Android Chrome yoki kompyuter brauzeri ishlatib ko\'ring.');
+      return;
+    }
+    if (notifOn) {
       setNotifEnabled(user.id, false);
       setNotifOn(false);
+      return;
     }
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') {
+      alert('Bildirishnomaga ruxsat berilmadi.\nBrauzer manzil satrida 🔒 belgisini bosing → Bildirishnomalar → Ruxsat bering.');
+      return;
+    }
+    setNotifEnabled(user.id, true);
+    setNotifOn(true);
+    new Notification('✅ Namoz Tracker', {
+      body: 'Namoz vaqti kelganda xabar beriladi!',
+      icon: '/favicon.ico',
+    });
+    scheduleNextPrayer();
   }
 
   function scheduleNextPrayer() {
@@ -169,8 +173,8 @@ export default function DashboardPage() {
                 Chiqish
               </button>
               <button type="button" onClick={toggleNotif}
-                className={`text-xs border px-3 py-1 rounded-full transition-all ${notifOn ? 'bg-green-700 text-white border-green-600' : 'text-green-400 border-green-800 hover:bg-green-900/50'}`}>
-                {notifOn ? '🔔 Yoq' : '🔕 Eslatma'}
+                className={`text-xs border px-3 py-1.5 rounded-full transition-all ${notifOn ? 'bg-green-700 text-white border-green-600' : 'text-green-400 border-green-800 hover:bg-green-900/50'}`}>
+                {notifOn ? '🔔 Yoqlangan' : '🔕 Eslatma'}
               </button>
             </div>
           </div>
