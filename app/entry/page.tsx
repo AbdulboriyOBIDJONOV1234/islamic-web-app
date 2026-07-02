@@ -293,7 +293,7 @@ export default function EntryPage() {
                     onChange={(e) => setDhikrInputs(prev => ({ ...prev, [d.key]: e.target.value }))}
                     onBlur={() => addDhikrVal(d.key, dhikrInputs[d.key])}
                     onKeyDown={(e) => { if (e.key === 'Enter') { addDhikrVal(d.key, dhikrInputs[d.key]); e.currentTarget.blur(); } }}
-                    placeholder="+qo'sh"
+                    placeholder="0"
                     className="dhikr-input"
                   />
                   <div className="flex gap-1">
@@ -330,7 +330,7 @@ export default function EntryPage() {
                 onChange={(e) => setSalawatInput(e.target.value)}
                 onBlur={() => addSalawatVal(salawatInput)}
                 onKeyDown={(e) => { if (e.key === 'Enter') { addSalawatVal(salawatInput); e.currentTarget.blur(); } }}
-                placeholder="+qo'sh"
+                placeholder="0"
                 className="number-input" />
               <span className="text-sm text-gray-400">marta qo&apos;sh</span>
             </div>
@@ -448,7 +448,7 @@ export default function EntryPage() {
                 onChange={(e) => setMorningInput(e.target.value)}
                 onBlur={() => addMorningPagesVal(morningInput)}
                 onKeyDown={(e) => { if (e.key === 'Enter') { addMorningPagesVal(morningInput); e.currentTarget.blur(); } }}
-                placeholder="+sahifa"
+                placeholder="0"
                 className="book-input"
               />
               <div className="flex gap-1 mt-1">
@@ -470,7 +470,7 @@ export default function EntryPage() {
                 onChange={(e) => setEveningInput(e.target.value)}
                 onBlur={() => addEveningPagesVal(eveningInput)}
                 onKeyDown={(e) => { if (e.key === 'Enter') { addEveningPagesVal(eveningInput); e.currentTarget.blur(); } }}
-                placeholder="+sahifa"
+                placeholder="0"
                 className="book-input"
               />
               <div className="flex gap-1 mt-1">
