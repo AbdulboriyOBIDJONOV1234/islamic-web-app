@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Namoz Tracker | Zikr & Salovat",
-  description: "Kunlik namoz, zikr va salovotlarni kuzating",
+  description: "Kunlik namoz, zikr va salovotlarni kuzatib boring",
 };
 
 export default function RootLayout({

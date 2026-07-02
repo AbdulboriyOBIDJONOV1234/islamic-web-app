@@ -37,9 +37,9 @@ export const DHIKR_TYPES = [
 ] as const;
 
 export const SALAWAT_OPTIONS = [
-  { label: 'Allohhumma solli ala Muhammad', arabic: 'اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ' },
-  { label: 'Sallosalloh alayhi wasallam', arabic: 'صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ' },
-  { label: 'Allohhumma solli wa sallim', arabic: 'اللَّهُمَّ صَلِّ وَسَلِّمْ' },
+  { label: 'Allohumma solli ala Muhammad', arabic: 'اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ' },
+  { label: 'Sollallohu alayhi vasallam', arabic: 'صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ' },
+  { label: 'Allohumma solli va sallim', arabic: 'اللَّهُمَّ صَلِّ وَسَلِّمْ' },
 ];
 
 export interface DailyStats {
@@ -70,12 +70,12 @@ export const DHIKR_LIST = [
 
 export const SALAWAT_LIST = [
   {
-    text: 'Allohhumma solli ala Muhammad',
+    text: 'Allohumma solli ala Muhammad',
     arabic: 'اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ',
     count: 100,
   },
   {
-    text: 'Sallosalloh alayhi wasallam',
+    text: 'Sollallohu alayhi vasallam',
     arabic: 'صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ',
     count: 100,
   },

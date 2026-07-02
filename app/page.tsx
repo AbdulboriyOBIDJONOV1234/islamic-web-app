@@ -94,7 +94,7 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">☽</div>
           <h1 className="text-3xl font-black gold-text mb-1">بِسْمِ اللَّهِ</h1>
-          <p className="text-green-300 text-xs tracking-widest">BISMILLAHIR ROHMANIR ROHIYM</p>
+          <p className="text-green-300 text-xs tracking-widest">BISMILLOHIR ROHMANIR ROHIYM</p>
         </div>
 
         {/* Card */}
@@ -218,7 +218,7 @@ export default function LoginPage() {
 
         <div className="text-center mt-6">
           <p className="gold-salawat text-lg">اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ</p>
-          <p className="text-green-400/60 text-xs mt-1">Allohhumma solli ala Muhammad ﷺ</p>
+          <p className="text-green-400/60 text-xs mt-1">Allohumma solli ala Muhammad ﷺ</p>
         </div>
       </div>
     </div>

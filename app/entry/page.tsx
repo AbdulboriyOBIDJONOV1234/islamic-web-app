@@ -273,7 +273,7 @@ export default function EntryPage() {
         <div className="card p-5">
           <h2 className="font-black text-gray-800 mb-1">💚 Salovat</h2>
           <p className="text-xs dhikr-arabic text-sm mb-1">اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ</p>
-          <p className="text-xs text-gray-400 mb-4">Allohhumma solli ala Muhammad ﷺ</p>
+          <p className="text-xs text-gray-400 mb-4">Allohumma solli ala Muhammad ﷺ</p>
 
           <div className="mb-4">
             <label className="text-xs font-semibold text-gray-600 mb-2 block">Jami marta</label>

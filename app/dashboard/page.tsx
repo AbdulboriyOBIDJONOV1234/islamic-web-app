@@ -442,7 +442,7 @@ export default function DashboardPage() {
           <p className="text-2xl mb-1 gold-arabic">
             اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ
           </p>
-          <p className="text-xs text-gray-600">Allohhumma solli ala Muhammad ﷺ</p>
+          <p className="text-xs text-gray-600">Allohumma solli ala Muhammad ﷺ</p>
           <p className="text-xs text-gray-400 mt-1">
             Bugun: {myEntry?.salawat_count || 0} marta
           </p>

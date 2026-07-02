@@ -147,7 +147,7 @@ export function calcBadges(entries: DailyEntry[], streak: number): Badge[] {
     { id: 'all5_25', icon: '🕌✨', name: 'Komil Namozchi', desc: '25 kun 5/5 namoz o\'qish', earned: daysWithAll5 >= 25 },
     { id: 'dhikr1000', icon: '📿', name: 'Zikrchi', desc: 'Bir kunda 1000+ zikr', earned: maxDhikrDay >= 1000 },
     { id: 'dhikr_total', icon: '💎', name: 'Zikr Ustasi', desc: 'Jami 10,000+ zikr', earned: totalDhikr >= 10000 },
-    { id: 'salawat500', icon: '💚', name: 'Salovat Chimp', desc: 'Jami 3000+ salovat', earned: totalSalawat >= 3000 },
+    { id: 'salawat500', icon: '💚', name: 'Salovat Ustasi', desc: 'Jami 3000+ salovat', earned: totalSalawat >= 3000 },
     { id: 'pages100', icon: '📚', name: 'O\'quvchi', desc: 'Jami 100+ sahifa o\'qish', earned: totalPages >= 100 },
     { id: 'pages500', icon: '📚✨', name: 'Kitobxon', desc: 'Jami 500+ sahifa o\'qish', earned: totalPages >= 500 },
   ];
