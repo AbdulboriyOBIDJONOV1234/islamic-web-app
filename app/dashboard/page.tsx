@@ -28,6 +28,10 @@ export default function DashboardPage() {
   const [showBadges, setShowBadges] = useState(false);
   const [showGoals, setShowGoals] = useState(false);
   const [yearMonth] = useState(() => format(new Date(), 'yyyy-MM'));
+  const [partnerLastRefresh, setPartnerLastRefresh] = useState<Date>(new Date());
+
+  // Ref to always access latest partner in the polling interval
+  const partnerRef = useRef<User | null>(null);
 
   const loadData = useCallback(async (userId: string) => {
     setLoading(true);
@@ -44,8 +48,10 @@ export default function DashboardPage() {
 
       const partnerUser = allUsers.find((u) => String(u.id) !== String(userId)) || null;
       setPartner(partnerUser);
+      partnerRef.current = partnerUser;
       if (partnerUser) {
         setPartnerEntry(await getEntryByDate(String(partnerUser.id), todayStr));
+        setPartnerLastRefresh(new Date());
       }
     } catch (err) {
       console.error('Dashboard load error:', err);
@@ -62,6 +68,19 @@ export default function DashboardPage() {
     setNiyatState(getNiyat(session.id, today()));
     setNotifOn(getNotifEnabled(session.id));
   }, [router, loadData]);
+
+  // Poll partner data every 30 seconds — works on any device/browser
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      if (!partnerRef.current) return;
+      try {
+        const entry = await getEntryByDate(String(partnerRef.current.id), today());
+        setPartnerEntry(entry);
+        setPartnerLastRefresh(new Date());
+      } catch { /* silent — don't break UI on network error */ }
+    }, 30_000);
+    return () => clearInterval(interval);
+  }, []);
 
   function handleNiyatSave(text: string) {
     if (!user) return;
@@ -297,20 +316,25 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Partner card */}
+        {/* Partner card — live status */}
         {partner && (
           <div className="card p-5">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center mb-1">
               <div>
                 <h2 className="font-bold text-gray-800">{partner.name}</h2>
-                <p className="text-xs text-gray-400">Bugungi holat • faqat ko&apos;rish</p>
+                <PartnerActivity entry={partnerEntry} />
               </div>
-              <span className={`text-xs px-3 py-1 rounded-full font-bold ${partnerEntry ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-400'}`}>
-                {partnerEntry ? '✓ Kiritilgan' : 'Kutilmoqda'}
-              </span>
+              <div className="text-right">
+                <span className={`text-xs px-3 py-1 rounded-full font-bold ${partnerEntry ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-400'}`}>
+                  {partnerEntry ? '✓ Kiritilgan' : 'Kiritilmagan'}
+                </span>
+                <p className="text-xs text-gray-300 mt-1 pr-1">
+                  {partnerLastRefresh.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })} da yangilandi
+                </p>
+              </div>
             </div>
 
-            <div className="grid grid-cols-5 gap-2 mb-4">
+            <div className="grid grid-cols-5 gap-2 mb-4 mt-4">
               {PRAYERS.map((p) => (
                 <div key={p.key}
                   className={`prayer-btn ${partnerEntry?.[p.key] ? 'prayer-active' : 'prayer-inactive'}`}>
@@ -325,6 +349,10 @@ export default function DashboardPage() {
               <StatChip label="Zikr" value={partnerEntry?.dhikr_count ?? '—'} cls="stat-mini-gold" />
               <StatChip label="Salovat" value={partnerEntry?.salawat_count ?? '—'} cls="stat-mini-purple" />
             </div>
+
+            <p className="text-xs text-gray-300 text-center mt-3">
+              🔄 Har 30 soniyada avtomatik yangilanadi
+            </p>
           </div>
         )}
 
@@ -440,6 +468,40 @@ export default function DashboardPage() {
       <Navigation />
     </div>
   );
+}
+
+function PartnerActivity({ entry }: { entry: DailyEntry | null }) {
+  const [, setTick] = useState(0);
+
+  // Re-render every 30s so the "X daqiqa avval" text stays fresh
+  useEffect(() => {
+    const t = setInterval(() => setTick((n) => n + 1), 30_000);
+    return () => clearInterval(t);
+  }, []);
+
+  if (!entry?.updated_at) {
+    return <p className="text-xs text-gray-400">⚪ Hali kiritilmagan</p>;
+  }
+
+  const diffMs = Date.now() - new Date(entry.updated_at).getTime();
+  const mins = Math.floor(diffMs / 60_000);
+
+  if (mins < 3) {
+    return (
+      <p className="text-xs text-green-500 flex items-center gap-1">
+        <span className="inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+        Hozirgina faol
+      </p>
+    );
+  }
+  if (mins < 60) {
+    return <p className="text-xs text-yellow-600">🟡 {mins} daqiqa avval faol</p>;
+  }
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) {
+    return <p className="text-xs text-orange-500">🟠 {hrs} soat avval faol</p>;
+  }
+  return <p className="text-xs text-gray-400">⚪ Bugun kiritilmagan</p>;
 }
 
 function StatChip({ label, value, cls }: { label: string; value: string | number; cls: string }) {
