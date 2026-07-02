@@ -23,7 +23,7 @@ import { format, subDays, eachDayOfInterval } from 'date-fns';
 type Period = 'week' | 'month' | 'year';
 
 function CalendarHeatmap({ entries }: { entries: DailyEntry[] }) {
-  const entryMap = new Map(entries.map((e) => [e.date, e]));
+  const entryMap = new Map(entries.map((e) => [String(e.date).substring(0, 10), e]));
   const endDate = new Date();
   const startDate = subDays(endDate, 89);
   const days = eachDayOfInterval({ start: startDate, end: endDate });
@@ -156,7 +156,7 @@ export default function StatisticsPage() {
       ]);
       setMyEntries(me);
       setAllMyEntries(all90);
-      const partnerUser = allUsers.find((u) => u.id !== userId) || null;
+      const partnerUser = allUsers.find((u) => String(u.id) !== String(userId)) || null;
       setPartner(partnerUser);
       if (partnerUser) {
         setPartnerEntries(await getEntriesByRange(partnerUser.id, start, end));
@@ -192,8 +192,8 @@ export default function StatisticsPage() {
 
   // Book comparison chart
   const bookChart = myChart.map((d, i) => {
-    const myE = myEntries.find((e) => e.date === d.fullDate);
-    const pE = partnerEntries.find((e) => e.date === d.fullDate);
+    const myE = myEntries.find((e) => String(e.date).substring(0, 10) === d.fullDate);
+    const pE = partnerEntries.find((e) => String(e.date).substring(0, 10) === d.fullDate);
     return {
       date: d.date,
       [user?.name || '']: (myE?.morning_pages || 0) + (myE?.evening_pages || 0),

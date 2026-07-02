@@ -55,7 +55,7 @@ export function buildChartData(
   startDate: string,
   endDate: string
 ) {
-  const entryMap = new Map(entries.map((e) => [e.date, e]));
+  const entryMap = new Map(entries.map((e) => [String(e.date).substring(0, 10), e]));
   const days = eachDayOfInterval({
     start: new Date(startDate + 'T00:00:00'),
     end: new Date(endDate + 'T00:00:00'),
@@ -107,7 +107,7 @@ export function clearSession() {
 
 export function calcStreak(entries: DailyEntry[]): number {
   if (!entries.length) return 0;
-  const entryMap = new Map(entries.map((e) => [e.date, e]));
+  const entryMap = new Map(entries.map((e) => [String(e.date).substring(0, 10), e]));
   const todayStr = today();
 
   let checkDate = todayStr;
