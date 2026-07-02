@@ -133,6 +133,18 @@ export default function StatisticsPage() {
     loadAll(user.id, period);
   }, [period, user]);
 
+  // Auto-refresh when tab becomes visible (after entering data on entry page)
+  useEffect(() => {
+    if (!user) return;
+    function onVisible() {
+      if (document.visibilityState === 'visible') {
+        loadAll(user!.id, period);
+      }
+    }
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [user, period]);
+
   async function loadAll(userId: string, p: Period) {
     setLoading(true);
     try {

@@ -39,6 +39,17 @@ export function getYearRange(date: Date = new Date()): { start: string; end: str
   };
 }
 
+// True zikr count: sum individual fields (more accurate), fallback to dhikr_count for old data
+export function entryZikr(entry: DailyEntry): number {
+  const individual =
+    (entry.subhanallah_count || 0) +
+    (entry.alhamdulillah_count || 0) +
+    (entry.allahu_akbar_count || 0) +
+    (entry.la_ilaha_count || 0) +
+    (entry.astaghfirullah_count || 0);
+  return individual > 0 ? individual : (entry.dhikr_count || 0);
+}
+
 export function buildChartData(
   entries: DailyEntry[],
   startDate: string,
@@ -58,7 +69,7 @@ export function buildChartData(
       fullDate: key,
       namoz: entry ? countPrayers(entry) : 0,
       qoldirilgan: entry ? getMissedPrayers(entry) : 5,
-      dhikr: entry?.dhikr_count || 0,
+      dhikr: entry ? entryZikr(entry) : 0,
       salawat: entry?.salawat_count || 0,
     };
   });
@@ -68,7 +79,7 @@ export function calcTotals(entries: DailyEntry[]) {
   const totalDays = entries.length;
   const totalNamoz = entries.reduce((s, e) => s + countPrayers(e), 0);
   const totalMissed = entries.reduce((s, e) => s + getMissedPrayers(e), 0);
-  const totalDhikr = entries.reduce((s, e) => s + (e.dhikr_count || 0), 0);
+  const totalDhikr = entries.reduce((s, e) => s + entryZikr(e), 0);
   const totalSalawat = entries.reduce((s, e) => s + (e.salawat_count || 0), 0);
   const avgNamoz = totalDays ? (totalNamoz / (totalDays * 5)) * 100 : 0;
 
@@ -129,14 +140,11 @@ export interface Badge {
 }
 
 export function calcBadges(entries: DailyEntry[], streak: number): Badge[] {
-  const totalDhikr = entries.reduce((s, e) => s + (e.dhikr_count || 0) + (e.subhanallah_count || 0) + (e.alhamdulillah_count || 0) + (e.allahu_akbar_count || 0) + (e.la_ilaha_count || 0) + (e.astaghfirullah_count || 0), 0);
+  const totalDhikr = entries.reduce((s, e) => s + entryZikr(e), 0);
   const totalSalawat = entries.reduce((s, e) => s + (e.salawat_count || 0), 0);
   const totalPages = entries.reduce((s, e) => s + (e.morning_pages || 0) + (e.evening_pages || 0), 0);
   const daysWithAll5 = entries.filter((e) => countPrayers(e) === 5).length;
-  const maxDhikrDay = entries.reduce((max, e) => {
-    const d = (e.dhikr_count || 0) + (e.subhanallah_count || 0) + (e.alhamdulillah_count || 0) + (e.allahu_akbar_count || 0) + (e.la_ilaha_count || 0) + (e.astaghfirullah_count || 0);
-    return Math.max(max, d);
-  }, 0);
+  const maxDhikrDay = entries.reduce((max, e) => Math.max(max, entryZikr(e)), 0);
 
   return [
     { id: 'first', icon: '🌱', name: 'Birinchi qadam', desc: 'Birinchi marotaba ma\'lumot kiriting', earned: entries.length > 0 },

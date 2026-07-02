@@ -1,4 +1,5 @@
 import type { DailyEntry } from './types';
+import { entryZikr } from './utils';
 
 export interface DailyAward {
   id: string;
@@ -26,8 +27,7 @@ export interface CumulativeAward {
 export function computeDayScore(entry: DailyEntry | null): number {
   if (!entry) return 0;
   const prayers = [entry.bomdod, entry.peshin, entry.asr, entry.shom, entry.xufton].filter(Boolean).length;
-  const zikr = (entry.subhanallah_count || 0) + (entry.alhamdulillah_count || 0) +
-    (entry.allahu_akbar_count || 0) + (entry.la_ilaha_count || 0) + (entry.astaghfirullah_count || 0);
+  const zikr = entryZikr(entry);
   const salawat = entry.salawat_count || 0;
   const pages = (entry.morning_pages || 0) + (entry.evening_pages || 0);
 
@@ -64,9 +64,7 @@ export function computeDailyAwards(
   const sub = entry?.subhanallah_count || 0;
   const alh = entry?.alhamdulillah_count || 0;
   const akb = entry?.allahu_akbar_count || 0;
-  const lai = entry?.la_ilaha_count || 0;
-  const ast = entry?.astaghfirullah_count || 0;
-  const zikr = sub + alh + akb + lai + ast;
+  const zikr = entry ? entryZikr(entry) : 0;
   const salawat = entry?.salawat_count || 0;
   const pages = (entry?.morning_pages || 0) + (entry?.evening_pages || 0);
 
@@ -160,9 +158,7 @@ export function computeDailyAwards(
 // ───────────────────────────────────────
 
 export function computeCumulativeAwards(entries: DailyEntry[], streak: number): CumulativeAward[] {
-  const zikr = entries.reduce((s, e) =>
-    s + (e.subhanallah_count || 0) + (e.alhamdulillah_count || 0) +
-    (e.allahu_akbar_count || 0) + (e.la_ilaha_count || 0) + (e.astaghfirullah_count || 0), 0);
+  const zikr = entries.reduce((s, e) => s + entryZikr(e), 0);
   const salawat = entries.reduce((s, e) => s + (e.salawat_count || 0), 0);
   const pages = entries.reduce((s, e) => s + (e.morning_pages || 0) + (e.evening_pages || 0), 0);
   const daysAll5 = entries.filter((e) =>
