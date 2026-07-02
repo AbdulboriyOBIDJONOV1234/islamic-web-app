@@ -525,3 +525,26 @@ body {
 .dua-check-done   { background: #15803d; color: white; }
 .dua-check-indigo { background: #6366f1; color: white; }
 .dua-check-undone { background: #e5e7eb; color: transparent; border: 2px solid #d1d5db; }
+
+/* ===================== MUKOFOTLAR ===================== */
+.award-score-bar {
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #f3f4f6;
+  display: flex;
+}
+
+.award-score-me {
+  height: 100%;
+  background: linear-gradient(90deg, #16a34a, #15803d);
+  border-radius: 999px 0 0 999px;
+  transition: width 0.7s ease;
+}
+
+.award-score-partner {
+  height: 100%;
+  background: linear-gradient(90deg, #a855f7, #7c3aed);
+  border-radius: 0 999px 999px 0;
+  transition: width 0.7s ease;
+}
