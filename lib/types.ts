@@ -31,7 +31,7 @@ export interface DailyEntry {
 export const DHIKR_TYPES = [
   { key: 'subhanallah_count', label: 'SubhanAlloh', arabic: 'سُبْحَانَ اللَّهِ', suggested: 33 },
   { key: 'alhamdulillah_count', label: 'Alhamdulilloh', arabic: 'الْحَمْدُ لِلَّهِ', suggested: 33 },
-  { key: 'allahu_akbar_count', label: 'Allohu Akbar', arabic: 'اللَّهُ أَكْبَرُ', suggested: 34 },
+  { key: 'allahu_akbar_count', label: 'Allohu Akbar', arabic: 'اللَّهُ أَكْبَرُ', suggested: 33 },
   { key: 'la_ilaha_count', label: 'La ilaha illalloh', arabic: 'لَا إِلَهَ إِلَّا اللَّهُ', suggested: 100 },
   { key: 'astaghfirullah_count', label: 'Astaghfirulloh', arabic: 'أَسْتَغْفِرُ اللَّهَ', suggested: 100 },
 ] as const;
@@ -63,7 +63,7 @@ export const PRAYERS: { key: Prayer; label: string; arabic: string; time: string
 export const DHIKR_LIST = [
   { text: 'SubhanAlloh', arabic: 'سُبْحَانَ اللَّهِ', count: 33 },
   { text: 'Alhamdulilloh', arabic: 'الْحَمْدُ لِلَّهِ', count: 33 },
-  { text: 'Allohu Akbar', arabic: 'اللَّهُ أَكْبَرُ', count: 34 },
+  { text: 'Allohu Akbar', arabic: 'اللَّهُ أَكْبَرُ', count: 33 },
   { text: 'La ilaha illalloh', arabic: 'لَا إِلَهَ إِلَّا اللَّهُ', count: 100 },
   { text: 'Astaghfirulloh', arabic: 'أَسْتَغْفِرُ اللَّهَ', count: 100 },
 ];

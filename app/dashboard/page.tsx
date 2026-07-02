@@ -363,7 +363,7 @@ export default function DashboardPage() {
             {[
               { label: 'SubhanAlloh', arabic: 'سُبْحَانَ اللَّهِ', n: 33, done: myEntry?.subhanallah_count },
               { label: 'Alhamdulilloh', arabic: 'الْحَمْدُ لِلَّهِ', n: 33, done: myEntry?.alhamdulillah_count },
-              { label: 'Allohu Akbar', arabic: 'اللَّهُ أَكْبَرُ', n: 34, done: myEntry?.allahu_akbar_count },
+              { label: 'Allohu Akbar', arabic: 'اللَّهُ أَكْبَرُ', n: 33, done: myEntry?.allahu_akbar_count },
               { label: 'La ilaha illalloh', arabic: 'لَا إِلَهَ إِلَّا اللَّهُ', n: 100, done: myEntry?.la_ilaha_count },
               { label: 'Astaghfirulloh', arabic: 'أَسْتَغْفِرُ اللَّهَ', n: 100, done: myEntry?.astaghfirullah_count },
             ].map((d) => (

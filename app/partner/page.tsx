@@ -162,7 +162,7 @@ export default function PartnerPage() {
               {[
                 { label: 'SubhanAlloh', n: 33, done: todayEntry.subhanallah_count },
                 { label: 'Alhamdulilloh', n: 33, done: todayEntry.alhamdulillah_count },
-                { label: 'Allohu Akbar', n: 34, done: todayEntry.allahu_akbar_count },
+                { label: 'Allohu Akbar', n: 33, done: todayEntry.allahu_akbar_count },
                 { label: 'La ilaha illalloh', n: 100, done: todayEntry.la_ilaha_count },
                 { label: 'Astaghfirulloh', n: 100, done: todayEntry.astaghfirullah_count },
               ].map((d) => (
