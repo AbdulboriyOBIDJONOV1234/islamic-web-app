@@ -8,7 +8,6 @@ const links = [
   { href: '/entry', icon: '✏️', label: 'Kiritish' },
   { href: '/statistics', icon: '📊', label: 'Statistika' },
   { href: '/quran', icon: '📖', label: 'Diniy' },
-  { href: '/partner', icon: '👤', label: 'Hamkor' },
 ];
 
 export default function Navigation() {
