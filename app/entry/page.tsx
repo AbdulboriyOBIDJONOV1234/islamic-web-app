@@ -292,7 +292,7 @@ export default function EntryPage() {
                     value={dhikrInputs[d.key]}
                     onChange={(e) => setDhikrInputs(prev => ({ ...prev, [d.key]: e.target.value }))}
                     onBlur={() => addDhikrVal(d.key, dhikrInputs[d.key])}
-                    onKeyDown={(e) => { if (e.key === 'Enter') { addDhikrVal(d.key, dhikrInputs[d.key]); e.currentTarget.blur(); } }}
+                    onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
                     placeholder="0"
                     className="dhikr-input"
                   />
@@ -329,7 +329,7 @@ export default function EntryPage() {
                 value={salawatInput}
                 onChange={(e) => setSalawatInput(e.target.value)}
                 onBlur={() => addSalawatVal(salawatInput)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { addSalawatVal(salawatInput); e.currentTarget.blur(); } }}
+                onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
                 placeholder="0"
                 className="number-input" />
               <span className="text-sm text-gray-400">marta qo&apos;sh</span>
@@ -447,7 +447,7 @@ export default function EntryPage() {
                 value={morningInput}
                 onChange={(e) => setMorningInput(e.target.value)}
                 onBlur={() => addMorningPagesVal(morningInput)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { addMorningPagesVal(morningInput); e.currentTarget.blur(); } }}
+                onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
                 placeholder="0"
                 className="book-input"
               />
@@ -469,7 +469,7 @@ export default function EntryPage() {
                 value={eveningInput}
                 onChange={(e) => setEveningInput(e.target.value)}
                 onBlur={() => addEveningPagesVal(eveningInput)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { addEveningPagesVal(eveningInput); e.currentTarget.blur(); } }}
+                onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
                 placeholder="0"
                 className="book-input"
               />
