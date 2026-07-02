@@ -32,6 +32,14 @@ export default function EntryPage() {
   const [bookName, setBookName] = useState('');
   const [bookHistory, setBookHistory] = useState<string[]>([]);
   const [showBookPicker, setShowBookPicker] = useState(false);
+  // Input buffers — what the user is currently typing to ADD
+  const [dhikrInputs, setDhikrInputs] = useState<Record<string, string>>({
+    subhanallah_count: '', alhamdulillah_count: '', allahu_akbar_count: '',
+    la_ilaha_count: '', astaghfirullah_count: '',
+  });
+  const [salawatInput, setSalawatInput] = useState('');
+  const [morningInput, setMorningInput] = useState('');
+  const [eveningInput, setEveningInput] = useState('');
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
 
@@ -133,31 +141,46 @@ export default function EntryPage() {
     scheduleAutoSave(true); // immediate save for prayer toggle
   }
 
-  function setDhikrVal(key: string, val: string) {
-    const n = parseInt(val) || 0;
+  // Add-mode: typed number is ADDED to the total, then input clears
+  function addDhikrVal(key: string, deltaStr: string) {
+    const delta = parseInt(deltaStr) || 0;
+    setDhikrInputs(prev => ({ ...prev, [key]: '' }));
+    if (delta <= 0) return;
     setDhikr((prev) => {
-      const next = { ...prev, [key]: n };
+      const next = { ...prev, [key]: (prev[key] || 0) + delta };
       stateRef.current = { ...stateRef.current, dhikr: next };
       return next;
     });
     scheduleAutoSave();
   }
 
-  function handleSalawatCount(val: string) {
-    setSalawatCount(val);
-    stateRef.current = { ...stateRef.current, salawatCount: val };
+  function addSalawatVal(deltaStr: string) {
+    const delta = parseInt(deltaStr) || 0;
+    setSalawatInput('');
+    if (delta <= 0) return;
+    const newTotal = String((parseInt(salawatCount) || 0) + delta);
+    setSalawatCount(newTotal);
+    stateRef.current = { ...stateRef.current, salawatCount: newTotal };
     scheduleAutoSave();
   }
 
-  function handleMorningPages(val: string) {
-    setMorningPages(val);
-    stateRef.current = { ...stateRef.current, morningPages: val };
+  function addMorningPagesVal(deltaStr: string) {
+    const delta = parseInt(deltaStr) || 0;
+    setMorningInput('');
+    if (delta <= 0) return;
+    const newTotal = String((parseInt(morningPages) || 0) + delta);
+    setMorningPages(newTotal);
+    stateRef.current = { ...stateRef.current, morningPages: newTotal };
     scheduleAutoSave();
   }
 
-  function handleEveningPages(val: string) {
-    setEveningPages(val);
-    stateRef.current = { ...stateRef.current, eveningPages: val };
+  function addEveningPagesVal(deltaStr: string) {
+    const delta = parseInt(deltaStr) || 0;
+    setEveningInput('');
+    if (delta <= 0) return;
+    const newTotal = String((parseInt(eveningPages) || 0) + delta);
+    setEveningPages(newTotal);
+    stateRef.current = { ...stateRef.current, eveningPages: newTotal };
     scheduleAutoSave();
   }
 
@@ -254,24 +277,31 @@ export default function EntryPage() {
             {DHIKR_TYPES.map((d) => (
               <div key={d.key} className="dhikr-row">
                 <div className="flex-1">
-                  <p className="text-sm font-bold text-gray-800">{d.label}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-bold text-gray-800">{d.label}</p>
+                    <span className={`text-xs font-black ${(dhikr[d.key] || 0) >= d.suggested ? 'text-green-600' : 'text-gray-400'}`}>
+                      {dhikr[d.key] || 0}
+                      {(dhikr[d.key] || 0) >= d.suggested ? ' ✓' : `/${d.suggested}`}
+                    </span>
+                  </div>
                   <p className="dhikr-arabic text-xs">{d.arabic}</p>
-                  <p className="text-xs text-gray-400">Tavsiya: ×{d.suggested}</p>
                 </div>
                 <div className="flex flex-col items-end gap-1">
                   <input
                     type="number" min="0" max="9999"
-                    value={dhikr[d.key] || ''}
-                    onChange={(e) => setDhikrVal(d.key, e.target.value)}
-                    placeholder="0"
+                    value={dhikrInputs[d.key]}
+                    onChange={(e) => setDhikrInputs(prev => ({ ...prev, [d.key]: e.target.value }))}
+                    onBlur={() => addDhikrVal(d.key, dhikrInputs[d.key])}
+                    onKeyDown={(e) => { if (e.key === 'Enter') { addDhikrVal(d.key, dhikrInputs[d.key]); e.currentTarget.blur(); } }}
+                    placeholder="+qo'sh"
                     className="dhikr-input"
                   />
                   <div className="flex gap-1">
                     {[d.suggested, d.suggested * 2].map((n) => (
                       <button type="button" key={n}
-                        onClick={() => setDhikrVal(d.key, String(n))}
+                        onClick={() => addDhikrVal(d.key, String(n))}
                         className="quick-btn quick-btn-sm">
-                        {n}
+                        +{n}
                       </button>
                     ))}
                   </div>
@@ -288,20 +318,27 @@ export default function EntryPage() {
           <p className="text-xs text-gray-400 mb-4">Allohumma solli ala Muhammad ﷺ</p>
 
           <div className="mb-4">
-            <label className="text-xs font-semibold text-gray-600 mb-2 block">Jami marta</label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-xs font-semibold text-gray-600">Jami marta</label>
+              <span className={`text-xl font-black ${(parseInt(salawatCount) || 0) >= 100 ? 'text-green-600' : 'text-gray-700'}`}>
+                {parseInt(salawatCount) || 0}{(parseInt(salawatCount) || 0) >= 100 ? ' ✓' : ''}
+              </span>
+            </div>
             <div className="flex items-center gap-3">
               <input type="number" min="0" max="99999"
-                value={salawatCount}
-                onChange={(e) => handleSalawatCount(e.target.value)}
-                placeholder="0"
+                value={salawatInput}
+                onChange={(e) => setSalawatInput(e.target.value)}
+                onBlur={() => addSalawatVal(salawatInput)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { addSalawatVal(salawatInput); e.currentTarget.blur(); } }}
+                placeholder="+qo'sh"
                 className="number-input" />
-              <span className="text-sm text-gray-400">marta</span>
+              <span className="text-sm text-gray-400">marta qo&apos;sh</span>
             </div>
             <div className="flex gap-2 mt-2 flex-wrap">
               {[10, 100, 200, 500, 1000].map((n) => (
                 <button type="button" key={n}
-                  onClick={() => handleSalawatCount(String(n))}
-                  className="quick-btn">{n}</button>
+                  onClick={() => addSalawatVal(String(n))}
+                  className="quick-btn">+{n}</button>
               ))}
             </div>
           </div>
@@ -401,40 +438,46 @@ export default function EntryPage() {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-semibold text-amber-700 mb-2 block">
-                🌅 Ertalab (sahifa)
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-xs font-semibold text-amber-700">🌅 Ertalab</label>
+                <span className="text-sm font-black text-amber-700">{parseInt(morningPages) || 0} s.</span>
+              </div>
               <input
                 type="number" min="0" max="999"
-                value={morningPages}
-                onChange={(e) => handleMorningPages(e.target.value)}
-                placeholder="0"
+                value={morningInput}
+                onChange={(e) => setMorningInput(e.target.value)}
+                onBlur={() => addMorningPagesVal(morningInput)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { addMorningPagesVal(morningInput); e.currentTarget.blur(); } }}
+                placeholder="+sahifa"
                 className="book-input"
               />
               <div className="flex gap-1 mt-1">
                 {[5, 10, 20].map((n) => (
                   <button type="button" key={n}
-                    onClick={() => handleMorningPages(String(n))}
-                    className="quick-btn quick-btn-sm">{n}</button>
+                    onClick={() => addMorningPagesVal(String(n))}
+                    className="quick-btn quick-btn-sm">+{n}</button>
                 ))}
               </div>
             </div>
             <div>
-              <label className="text-xs font-semibold text-indigo-700 mb-2 block">
-                🌙 Kechqurun (sahifa)
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-xs font-semibold text-indigo-700">🌙 Kechqurun</label>
+                <span className="text-sm font-black text-indigo-700">{parseInt(eveningPages) || 0} s.</span>
+              </div>
               <input
                 type="number" min="0" max="999"
-                value={eveningPages}
-                onChange={(e) => handleEveningPages(e.target.value)}
-                placeholder="0"
+                value={eveningInput}
+                onChange={(e) => setEveningInput(e.target.value)}
+                onBlur={() => addEveningPagesVal(eveningInput)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { addEveningPagesVal(eveningInput); e.currentTarget.blur(); } }}
+                placeholder="+sahifa"
                 className="book-input"
               />
               <div className="flex gap-1 mt-1">
                 {[5, 10, 20].map((n) => (
                   <button type="button" key={n}
-                    onClick={() => handleEveningPages(String(n))}
-                    className="quick-btn quick-btn-sm">{n}</button>
+                    onClick={() => addEveningPagesVal(String(n))}
+                    className="quick-btn quick-btn-sm">+{n}</button>
                 ))}
               </div>
             </div>
