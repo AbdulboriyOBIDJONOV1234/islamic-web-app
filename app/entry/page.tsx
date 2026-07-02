@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Navigation from '@/components/Navigation';
 import { getSession, today, formatDisplayDate } from '@/lib/utils';
-import { getEntryByDate, upsertEntry } from '@/lib/supabase';
+import { getEntryByDate, upsertEntry, getAllEntries } from '@/lib/supabase';
 import type { Prayer } from '@/lib/types';
 import { PRAYERS, DHIKR_TYPES, SALAWAT_OPTIONS } from '@/lib/types';
 
@@ -30,6 +30,8 @@ export default function EntryPage() {
   const [morningPages, setMorningPages] = useState('');
   const [eveningPages, setEveningPages] = useState('');
   const [bookName, setBookName] = useState('');
+  const [bookHistory, setBookHistory] = useState<string[]>([]);
+  const [showBookPicker, setShowBookPicker] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
 
@@ -88,7 +90,17 @@ export default function EntryPage() {
   async function loadEntry(userId: string) {
     setLoading(true);
     try {
-      const entry = await getEntryByDate(userId, today());
+      const [entry, allEntries] = await Promise.all([
+        getEntryByDate(userId, today()),
+        getAllEntries(userId),
+      ]);
+      const seen = new Set<string>();
+      const books: string[] = [];
+      for (const e of allEntries) {
+        const name = e.book_name?.trim();
+        if (name && !seen.has(name)) { books.push(name); seen.add(name); }
+      }
+      setBookHistory(books);
       if (entry) {
         setPrayers({ bomdod: entry.bomdod, peshin: entry.peshin, asr: entry.asr, shom: entry.shom, xufton: entry.xufton });
         setDhikr({
@@ -358,13 +370,33 @@ export default function EntryPage() {
             <label className="text-xs font-semibold text-gray-600 mb-2 block">
               Qaysi kitob? (ixtiyoriy)
             </label>
-            <input
-              type="text"
-              value={bookName}
-              onChange={(e) => handleBookName(e.target.value)}
-              placeholder="Kitob nomi..."
-              className="w-full px-3 py-2 border-2 border-gray-100 rounded-xl text-sm outline-none focus:border-amber-400 bg-amber-50/30"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                value={bookName}
+                onChange={(e) => { handleBookName(e.target.value); setShowBookPicker(true); }}
+                onFocus={() => setShowBookPicker(true)}
+                onBlur={() => setTimeout(() => setShowBookPicker(false), 150)}
+                placeholder="Kitob nomi..."
+                className="w-full px-3 py-2 border-2 border-gray-100 rounded-xl text-sm outline-none focus:border-amber-400 bg-amber-50/30"
+              />
+              {showBookPicker && bookHistory.filter(b => !bookName || b.toLowerCase().includes(bookName.toLowerCase())).length > 0 && (
+                <div className="absolute top-full left-0 right-0 bg-white border border-amber-200 rounded-xl shadow-lg z-10 mt-1 max-h-44 overflow-y-auto">
+                  {bookHistory
+                    .filter(b => !bookName || b.toLowerCase().includes(bookName.toLowerCase()))
+                    .map(book => (
+                      <button
+                        type="button"
+                        key={book}
+                        onMouseDown={() => { handleBookName(book); setShowBookPicker(false); }}
+                        className="w-full text-left px-3 py-2.5 text-sm hover:bg-amber-50 border-b border-gray-50 last:border-0 flex items-center gap-2">
+                        <span>📚</span>
+                        <span className="truncate">{book}</span>
+                      </button>
+                    ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">

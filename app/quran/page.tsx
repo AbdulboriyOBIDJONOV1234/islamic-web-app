@@ -3,19 +3,21 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Navigation from '@/components/Navigation';
-import { getSession } from '@/lib/utils';
+import { getSession, formatDisplayDate } from '@/lib/utils';
 import {
   getQuranProgress, setQuranProgress,
   getDuaChecklist, setDuaChecklist,
   getGoals, setGoals,
   type MonthlyGoals,
 } from '@/lib/local';
+import { getAllEntries } from '@/lib/supabase';
+import type { DailyEntry } from '@/lib/types';
 import { SURAHS } from '@/lib/quran-data';
 import { MORNING_DUAS, EVENING_DUAS } from '@/lib/dua-data';
 import { today } from '@/lib/utils';
 import { format } from 'date-fns';
 
-type Tab = 'quran' | 'dua' | 'goals';
+type Tab = 'quran' | 'dua' | 'goals' | 'kitob';
 
 export default function QuranPage() {
   const router = useRouter();
@@ -26,6 +28,8 @@ export default function QuranPage() {
   const [morningDone, setMorningDone] = useState<number[]>([]);
   const [eveningDone, setEveningDone] = useState<number[]>([]);
   const [goals, setGoalsState] = useState<MonthlyGoals>({ namoz: 25, dhikr: 3000, salawat: 3000, pages: 100 });
+  const [entries, setEntries] = useState<DailyEntry[]>([]);
+  const [entriesLoaded, setEntriesLoaded] = useState(false);
   const [yearMonth] = useState(() => format(new Date(), 'yyyy-MM'));
   const [goalsSaved, setGoalsSaved] = useState(false);
 
@@ -43,6 +47,10 @@ export default function QuranPage() {
     setEveningDone(dc.evening);
 
     setGoalsState(getGoals(session.id, yearMonth));
+
+    getAllEntries(session.id)
+      .then((data) => { setEntries(data); setEntriesLoaded(true); })
+      .catch(() => setEntriesLoaded(true));
   }, [router, yearMonth]);
 
   function toggleSurah(index: number) {
@@ -117,12 +125,12 @@ export default function QuranPage() {
 
         {/* Tabs */}
         <div className="card p-2 flex gap-1 mb-4">
-          {(['quran', 'dua', 'goals'] as Tab[]).map((t) => (
+          {(['quran', 'dua', 'goals', 'kitob'] as Tab[]).map((t) => (
             <button type="button" key={t} onClick={() => setTab(t)}
-              className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all ${
+              className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${
                 tab === t ? 'bg-green-800 text-white shadow' : 'text-gray-400'
               }`}>
-              {t === 'quran' ? '📖 Qur\'on' : t === 'dua' ? '🤲 Duolar' : '🎯 Maqsad'}
+              {t === 'quran' ? '📖 Qur\'on' : t === 'dua' ? '🤲 Dua' : t === 'goals' ? '🎯 Maqsad' : '📚 Kitob'}
             </button>
           ))}
         </div>
@@ -283,6 +291,9 @@ export default function QuranPage() {
           </div>
         )}
 
+        {/* === KITOB TAB === */}
+        {tab === 'kitob' && <KitobTab entries={entries} loaded={entriesLoaded} />}
+
         {/* === GOALS TAB === */}
         {tab === 'goals' && (
           <div className="space-y-4">
@@ -364,6 +375,137 @@ function GoalInput({ label, value, unit, onChange }: {
           <span className="text-sm text-gray-500 font-normal normal-case">{unit}</span>
         </div>
       </label>
+    </div>
+  );
+}
+
+// ─── Kitob tab ───────────────────────────────────────────────────────────────
+
+interface BookStat {
+  name: string;
+  totalPages: number;
+  daysRead: number;
+  firstDate: string;
+  lastDate: string;
+}
+
+function buildBookStats(entries: DailyEntry[]): BookStat[] {
+  const map = new Map<string, BookStat>();
+  for (const e of entries) {
+    const name = e.book_name?.trim();
+    const pages = (e.morning_pages || 0) + (e.evening_pages || 0);
+    if (!name || pages === 0) continue;
+    const existing = map.get(name);
+    if (existing) {
+      existing.totalPages += pages;
+      existing.daysRead += 1;
+      if (e.date < existing.firstDate) existing.firstDate = e.date;
+      if (e.date > existing.lastDate) existing.lastDate = e.date;
+    } else {
+      map.set(name, { name, totalPages: pages, daysRead: 1, firstDate: e.date, lastDate: e.date });
+    }
+  }
+  return [...map.values()].sort((a, b) => b.lastDate.localeCompare(a.lastDate));
+}
+
+function KitobTab({ entries, loaded }: { entries: DailyEntry[]; loaded: boolean }) {
+  if (!loaded) {
+    return <div className="card p-10 text-center text-gray-400">⏳ Yuklanmoqda...</div>;
+  }
+
+  const bookStats = buildBookStats(entries);
+  const totalPages = bookStats.reduce((s, b) => s + b.totalPages, 0);
+  const totalDays = bookStats.reduce((s, b) => s + b.daysRead, 0);
+  const currentBook = entries.find(e => e.book_name?.trim())?.book_name?.trim() || null;
+
+  if (bookStats.length === 0) {
+    return (
+      <div className="space-y-4">
+        <div className="card p-8 text-center">
+          <div className="text-5xl mb-3">📚</div>
+          <h2 className="font-bold text-gray-700 mb-2">Hali kitob yo&apos;q</h2>
+          <p className="text-sm text-gray-400">
+            Kiritish sahifasida kitob nomini yozing va qancha sahifa o&apos;qiganingizni belgilang
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4 pb-4">
+      {/* Summary */}
+      <div className="card p-5">
+        <div className="flex justify-between items-center mb-3">
+          <h2 className="font-black text-gray-800">📚 Kitoblarim</h2>
+          <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-bold">
+            {bookStats.length} ta kitob
+          </span>
+        </div>
+        <div className="grid grid-cols-3 gap-2 mb-3">
+          <div className="bg-amber-50 rounded-xl p-3 text-center">
+            <p className="text-xl font-black text-amber-700">{totalPages}</p>
+            <p className="text-xs text-amber-600 mt-0.5">jami sahifa</p>
+          </div>
+          <div className="bg-green-50 rounded-xl p-3 text-center">
+            <p className="text-xl font-black text-green-700">{totalDays}</p>
+            <p className="text-xs text-green-600 mt-0.5">o&apos;qigan kun</p>
+          </div>
+          <div className="bg-blue-50 rounded-xl p-3 text-center">
+            <p className="text-xl font-black text-blue-700">
+              {totalDays > 0 ? Math.round(totalPages / totalDays) : 0}
+            </p>
+            <p className="text-xs text-blue-600 mt-0.5">sahifa/kun</p>
+          </div>
+        </div>
+        {currentBook && (
+          <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-2">
+            <span className="text-lg">📖</span>
+            <div>
+              <p className="text-xs text-amber-600 font-semibold">Hozir o&apos;qilmoqda</p>
+              <p className="text-sm font-bold text-amber-800">{currentBook}</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Book list */}
+      <div className="card p-5">
+        <h3 className="font-bold text-gray-800 mb-4">Barcha kitoblar</h3>
+        <div className="space-y-4">
+          {bookStats.map((book, i) => (
+            <div key={book.name} className={i < bookStats.length - 1 ? 'border-b border-gray-100 pb-4' : ''}>
+              <div className="flex justify-between items-start gap-2">
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-gray-800 text-sm truncate">📖 {book.name}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    {book.firstDate === book.lastDate
+                      ? formatDisplayDate(book.firstDate)
+                      : `${formatDisplayDate(book.firstDate)} — ${formatDisplayDate(book.lastDate)}`}
+                  </p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="text-xl font-black text-amber-700">{book.totalPages}</p>
+                  <p className="text-xs text-gray-400">sahifa</p>
+                </div>
+              </div>
+              <div className="flex gap-4 mt-2">
+                <span className="text-xs text-gray-500">📅 {book.daysRead} kun</span>
+                <span className="text-xs text-gray-500">
+                  ~{Math.round(book.totalPages / book.daysRead)} sahifa/kun
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="card-gold p-4">
+        <p className="text-xs text-gray-600">
+          💡 Bu ro&apos;yxat faqat siz uchun — hamkoringiz ko&apos;rmaydi.
+          Umumiy statistikada ikkalangiznin jami sahifalari ko&apos;rinadi.
+        </p>
+      </div>
     </div>
   );
 }
