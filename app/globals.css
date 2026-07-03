@@ -569,7 +569,7 @@ body {
   flex-direction: column;
   align-items: center;
   flex-shrink: 0;
-  width: 32px;
+  width: 40px;
 }
 .chart-container {
   min-width: var(--chart-min-w, 0px);

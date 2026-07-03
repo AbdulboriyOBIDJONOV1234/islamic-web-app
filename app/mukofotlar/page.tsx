@@ -4,7 +4,6 @@ import { useEffect, useRef, useState, useCallback, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation';
 import Navigation from '@/components/Navigation';
 import { getSession, today, calcStreak, formatDisplayDate } from '@/lib/utils';
-import { format } from 'date-fns';
 import { getEntryByDate, getAllUsers, getAllEntries } from '@/lib/supabase';
 import { getDuaChecklist } from '@/lib/local';
 import { MORNING_DUAS, EVENING_DUAS } from '@/lib/dua-data';
@@ -372,6 +371,16 @@ function AwardGrid({ awards }: { awards: DailyAward[] }) {
 
 const MAX_SCORE = 250;
 const BAR_H = 72;
+const UZ_MONTHS = ['yan','fev','mar','apr','may','iyun','iyul','avg','sen','okt','noy','dek'];
+const UZ_DAYS   = ['Yak','Dush','Sesh','Chor','Pay','Jum','Shan'];
+function fmtDateShort(dateStr: string) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return `${d.getDate()} ${UZ_MONTHS[d.getMonth()]}`;
+}
+function fmtDateFull(dateStr: string) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return `${d.getDate()}-${UZ_MONTHS[d.getMonth()]}, ${UZ_DAYS[d.getDay()]}`;
+}
 
 function ChartBar({ score, variant, label }: { score: number; variant: 'me' | 'partner'; label: string }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -385,9 +394,9 @@ function ChartBar({ score, variant, label }: { score: number; variant: 'me' | 'p
 function ChartMinWidth({ count, children }: { count: number; children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    ref.current?.style.setProperty('--chart-min-w', `${count * 40}px`);
+    ref.current?.style.setProperty('--chart-min-w', `${count * 48}px`);
   }, [count]);
-  return <div ref={ref} className="chart-container flex items-end gap-2 px-1">{children}</div>;
+  return <div ref={ref} className="chart-container flex items-end gap-3 px-1">{children}</div>;
 }
 
 function DailyHistory({
@@ -432,7 +441,7 @@ function DailyHistory({
             const pE  = pMap.get(dateStr)  || null;
             const myScore = computeDayScore(myE);
             const pScore  = computeDayScore(pE);
-            const label = format(new Date(dateStr + 'T00:00:00'), 'dd/MM');
+            const label = fmtDateShort(dateStr);
             return (
               <div key={dateStr} className="chart-col">
                 <div className="flex items-end gap-0.5 h-[72px]">
@@ -441,7 +450,7 @@ function DailyHistory({
                     <ChartBar score={pScore} variant="partner" label={`${partnerName}: ${pScore} ball`} />
                   )}
                 </div>
-                <p className="text-2xs text-gray-400 mt-1 text-center">{label}</p>
+                <p className="text-2xs text-gray-400 mt-1 text-center leading-tight">{label}</p>
               </div>
             );
           })}
@@ -474,25 +483,33 @@ function DailyHistory({
           const myLvl    = getScoreLevel(myScore);
           const pLvl     = getScoreLevel(pScore);
           return (
-            <div key={dateStr} className="flex items-start gap-2 text-xs">
-              <span className="text-gray-400 shrink-0 pt-0.5 w-9">
-                {format(new Date(dateStr + 'T00:00:00'), 'dd/MM')}
-              </span>
-              <div className="flex-1 space-y-0.5">
+            <div key={dateStr} className="rounded-xl border border-gray-100 bg-gray-50/50 px-3 py-2.5">
+              <p className="text-2xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+                {fmtDateFull(dateStr)}
+              </p>
+              <div className="space-y-1.5">
                 {myE && (
-                  <div className="flex items-center gap-1">
-                    <span className={`font-bold w-14 shrink-0 truncate ${myLvl.colorClass}`}>{myName}</span>
-                    {myAwards.map(a => <span key={a.id} title={a.title}>{a.icon}</span>)}
-                    {myAwards.length === 0 && <span className="text-gray-300">—</span>}
-                    <span className="ml-auto text-gray-400 shrink-0">{myScore} b</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
+                    <span className={`text-xs font-bold shrink-0 ${myLvl.colorClass}`}>{myName}</span>
+                    <div className="flex gap-0.5 flex-1 min-w-0 flex-wrap">
+                      {myAwards.length > 0
+                        ? myAwards.map(a => <span key={a.id} title={a.title} className="text-sm">{a.icon}</span>)
+                        : <span className="text-xs text-gray-300">—</span>}
+                    </div>
+                    <span className={`text-xs font-black shrink-0 ${myLvl.colorClass}`}>{myScore} b</span>
                   </div>
                 )}
                 {pE && (
-                  <div className="flex items-center gap-1">
-                    <span className={`font-bold w-14 shrink-0 truncate ${pLvl.colorClass}`}>{partnerName}</span>
-                    {pAwards.map(a => <span key={a.id} title={a.title}>{a.icon}</span>)}
-                    {pAwards.length === 0 && <span className="text-gray-300">—</span>}
-                    <span className="ml-auto text-gray-400 shrink-0">{pScore} b</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-purple-400 shrink-0" />
+                    <span className={`text-xs font-bold shrink-0 ${pLvl.colorClass}`}>{partnerName}</span>
+                    <div className="flex gap-0.5 flex-1 min-w-0 flex-wrap">
+                      {pAwards.length > 0
+                        ? pAwards.map(a => <span key={a.id} title={a.title} className="text-sm">{a.icon}</span>)
+                        : <span className="text-xs text-gray-300">—</span>}
+                    </div>
+                    <span className={`text-xs font-black shrink-0 ${pLvl.colorClass}`}>{pScore} b</span>
                   </div>
                 )}
               </div>
