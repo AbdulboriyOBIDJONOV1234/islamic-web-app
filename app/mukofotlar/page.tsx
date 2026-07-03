@@ -296,6 +296,15 @@ export default function MukofotlarPage() {
           </div>
         )}
 
+        {/* ── DAILY HISTORY ── */}
+        <DailyHistory
+          myName={user?.name || ''}
+          partnerName={partner?.name || ''}
+          myEntries={myEntries}
+          partnerEntries={partnerEntries}
+          todayStr={todayStr}
+        />
+
         {/* ── DAILY MOTIVATIONAL QUOTE ── */}
         <div className="card-gold p-5 text-center">
           <p className="text-xs text-gray-400 uppercase tracking-widest mb-2">Bugungi oyat / hadis</p>
@@ -356,6 +365,90 @@ function AwardGrid({ awards }: { awards: DailyAward[] }) {
           )}
         </div>
       ))}
+    </div>
+  );
+}
+
+function DailyHistory({
+  myName, partnerName, myEntries, partnerEntries, todayStr,
+}: {
+  myName: string;
+  partnerName: string;
+  myEntries: DailyEntry[];
+  partnerEntries: DailyEntry[];
+  todayStr: string;
+}) {
+  const myMap = new Map(myEntries.map(e => [String(e.date).substring(0, 10), e]));
+  const pMap  = new Map(partnerEntries.map(e => [String(e.date).substring(0, 10), e]));
+
+  const allDates = new Set([
+    ...myEntries.map(e => String(e.date).substring(0, 10)),
+    ...partnerEntries.map(e => String(e.date).substring(0, 10)),
+  ]);
+  const pastDates = [...allDates]
+    .filter(d => d !== todayStr)
+    .sort((a, b) => b.localeCompare(a))
+    .slice(0, 20);
+
+  if (pastDates.length === 0) return null;
+
+  return (
+    <div className="card p-5">
+      <h2 className="font-black text-gray-800 mb-4">📅 O&apos;tgan kunlar tarixi</h2>
+      <div className="space-y-2">
+        {pastDates.map(dateStr => {
+          const myE = myMap.get(dateStr) || null;
+          const pE  = pMap.get(dateStr)  || null;
+          const myAwards = myE ? computeDailyAwards(myE, [], [], 0, 0).filter(a => a.earned) : [];
+          const pAwards  = pE  ? computeDailyAwards(pE,  [], [], 0, 0).filter(a => a.earned) : [];
+          const myScore  = computeDayScore(myE);
+          const pScore   = computeDayScore(pE);
+          const myLvl    = getScoreLevel(myScore);
+          const pLvl     = getScoreLevel(pScore);
+
+          return (
+            <div key={dateStr} className="border border-gray-100 rounded-xl p-3 bg-gray-50/40">
+              <p className="text-xs font-bold text-gray-400 mb-2">{formatDisplayDate(dateStr)}</p>
+              <div className="space-y-1.5">
+                {/* My row */}
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-green-700 w-16 shrink-0 truncate">{myName}</span>
+                  <div className="flex gap-0.5 flex-1 min-w-0">
+                    {myE
+                      ? myAwards.length > 0
+                        ? myAwards.map(a => <span key={a.id} className="text-sm" title={a.title}>{a.icon}</span>)
+                        : <span className="text-xs text-gray-300 italic">—</span>
+                      : <span className="text-xs text-gray-200">kiritilmagan</span>}
+                  </div>
+                  {myE && (
+                    <span className={`text-xs font-black shrink-0 ${myLvl.colorClass}`}>
+                      {myScore} ball
+                    </span>
+                  )}
+                </div>
+                {/* Partner row */}
+                {partnerName && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-purple-700 w-16 shrink-0 truncate">{partnerName}</span>
+                    <div className="flex gap-0.5 flex-1 min-w-0">
+                      {pE
+                        ? pAwards.length > 0
+                          ? pAwards.map(a => <span key={a.id} className="text-sm" title={a.title}>{a.icon}</span>)
+                          : <span className="text-xs text-gray-300 italic">—</span>
+                        : <span className="text-xs text-gray-200">kiritilmagan</span>}
+                    </div>
+                    {pE && (
+                      <span className={`text-xs font-black shrink-0 ${pLvl.colorClass}`}>
+                        {pScore} ball
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
