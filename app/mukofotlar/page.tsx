@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import Navigation from '@/components/Navigation';
 import { getSession, today, calcStreak, formatDisplayDate } from '@/lib/utils';
+import { format } from 'date-fns';
 import { getEntryByDate, getAllUsers, getAllEntries } from '@/lib/supabase';
 import { getDuaChecklist } from '@/lib/local';
 import { MORNING_DUAS, EVENING_DUAS } from '@/lib/dua-data';
@@ -369,6 +370,26 @@ function AwardGrid({ awards }: { awards: DailyAward[] }) {
   );
 }
 
+const MAX_SCORE = 250;
+const BAR_H = 72;
+
+function ChartBar({ score, variant, label }: { score: number; variant: 'me' | 'partner'; label: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const h = score > 0 ? Math.max(4, Math.round((score / MAX_SCORE) * BAR_H)) : 0;
+  useEffect(() => {
+    ref.current?.style.setProperty('--bar-h', `${h}px`);
+  }, [h]);
+  return <div ref={ref} className={`chart-bar-${variant}`} title={label} />;
+}
+
+function ChartMinWidth({ count, children }: { count: number; children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    ref.current?.style.setProperty('--chart-min-w', `${count * 40}px`);
+  }, [count]);
+  return <div ref={ref} className="chart-container flex items-end gap-2 px-1">{children}</div>;
+}
+
 function DailyHistory({
   myName, partnerName, myEntries, partnerEntries, todayStr,
 }: {
@@ -385,18 +406,65 @@ function DailyHistory({
     ...myEntries.map(e => String(e.date).substring(0, 10)),
     ...partnerEntries.map(e => String(e.date).substring(0, 10)),
   ]);
+
   const pastDates = [...allDates]
     .filter(d => d !== todayStr)
-    .sort((a, b) => b.localeCompare(a))
-    .slice(0, 20);
+    .sort((a, b) => a.localeCompare(b))
+    .filter(d => {
+      const ms = computeDayScore(myMap.get(d) || null);
+      const ps = computeDayScore(pMap.get(d) || null);
+      return ms > 0 || ps > 0;
+    })
+    .slice(-20);
 
   if (pastDates.length === 0) return null;
 
   return (
     <div className="card p-5">
-      <h2 className="font-black text-gray-800 mb-4">📅 O&apos;tgan kunlar tarixi</h2>
-      <div className="space-y-2">
-        {pastDates.map(dateStr => {
+      <h2 className="font-black text-gray-800 mb-1">📅 Kunlik ball tarixi</h2>
+      <p className="text-xs text-gray-400 mb-4">Oxirgi {pastDates.length} kun</p>
+
+      {/* ── BAR CHART ── */}
+      <div className="overflow-x-auto -mx-1 pb-1">
+        <ChartMinWidth count={pastDates.length}>
+          {pastDates.map(dateStr => {
+            const myE = myMap.get(dateStr) || null;
+            const pE  = pMap.get(dateStr)  || null;
+            const myScore = computeDayScore(myE);
+            const pScore  = computeDayScore(pE);
+            const label = format(new Date(dateStr + 'T00:00:00'), 'dd/MM');
+            return (
+              <div key={dateStr} className="chart-col">
+                <div className="flex items-end gap-0.5 h-[72px]">
+                  <ChartBar score={myScore} variant="me" label={`${myName}: ${myScore} ball`} />
+                  {partnerName && (
+                    <ChartBar score={pScore} variant="partner" label={`${partnerName}: ${pScore} ball`} />
+                  )}
+                </div>
+                <p className="text-2xs text-gray-400 mt-1 text-center">{label}</p>
+              </div>
+            );
+          })}
+        </ChartMinWidth>
+      </div>
+
+      {/* Legend */}
+      <div className="flex gap-4 mt-3 mb-4">
+        <div className="flex items-center gap-1.5">
+          <div className="w-3 h-3 rounded-sm bg-green-500" />
+          <span className="text-xs text-gray-500 font-semibold">{myName}</span>
+        </div>
+        {partnerName && (
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded-sm bg-purple-400" />
+            <span className="text-xs text-gray-500 font-semibold">{partnerName}</span>
+          </div>
+        )}
+      </div>
+
+      {/* ── AWARD ICONS PER DAY ── */}
+      <div className="space-y-2 border-t border-gray-100 pt-3">
+        {[...pastDates].reverse().map(dateStr => {
           const myE = myMap.get(dateStr) || null;
           const pE  = pMap.get(dateStr)  || null;
           const myAwards = myE ? computeDailyAwards(myE, [], [], 0, 0).filter(a => a.earned) : [];
@@ -405,43 +473,26 @@ function DailyHistory({
           const pScore   = computeDayScore(pE);
           const myLvl    = getScoreLevel(myScore);
           const pLvl     = getScoreLevel(pScore);
-
           return (
-            <div key={dateStr} className="border border-gray-100 rounded-xl p-3 bg-gray-50/40">
-              <p className="text-xs font-bold text-gray-400 mb-2">{formatDisplayDate(dateStr)}</p>
-              <div className="space-y-1.5">
-                {/* My row */}
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-green-700 w-16 shrink-0 truncate">{myName}</span>
-                  <div className="flex gap-0.5 flex-1 min-w-0">
-                    {myE
-                      ? myAwards.length > 0
-                        ? myAwards.map(a => <span key={a.id} className="text-sm" title={a.title}>{a.icon}</span>)
-                        : <span className="text-xs text-gray-300 italic">—</span>
-                      : <span className="text-xs text-gray-200">kiritilmagan</span>}
+            <div key={dateStr} className="flex items-start gap-2 text-xs">
+              <span className="text-gray-400 shrink-0 pt-0.5 w-9">
+                {format(new Date(dateStr + 'T00:00:00'), 'dd/MM')}
+              </span>
+              <div className="flex-1 space-y-0.5">
+                {myE && (
+                  <div className="flex items-center gap-1">
+                    <span className={`font-bold w-14 shrink-0 truncate ${myLvl.colorClass}`}>{myName}</span>
+                    {myAwards.map(a => <span key={a.id} title={a.title}>{a.icon}</span>)}
+                    {myAwards.length === 0 && <span className="text-gray-300">—</span>}
+                    <span className="ml-auto text-gray-400 shrink-0">{myScore} b</span>
                   </div>
-                  {myE && (
-                    <span className={`text-xs font-black shrink-0 ${myLvl.colorClass}`}>
-                      {myScore} ball
-                    </span>
-                  )}
-                </div>
-                {/* Partner row */}
-                {partnerName && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-purple-700 w-16 shrink-0 truncate">{partnerName}</span>
-                    <div className="flex gap-0.5 flex-1 min-w-0">
-                      {pE
-                        ? pAwards.length > 0
-                          ? pAwards.map(a => <span key={a.id} className="text-sm" title={a.title}>{a.icon}</span>)
-                          : <span className="text-xs text-gray-300 italic">—</span>
-                        : <span className="text-xs text-gray-200">kiritilmagan</span>}
-                    </div>
-                    {pE && (
-                      <span className={`text-xs font-black shrink-0 ${pLvl.colorClass}`}>
-                        {pScore} ball
-                      </span>
-                    )}
+                )}
+                {pE && (
+                  <div className="flex items-center gap-1">
+                    <span className={`font-bold w-14 shrink-0 truncate ${pLvl.colorClass}`}>{partnerName}</span>
+                    {pAwards.map(a => <span key={a.id} title={a.title}>{a.icon}</span>)}
+                    {pAwards.length === 0 && <span className="text-gray-300">—</span>}
+                    <span className="ml-auto text-gray-400 shrink-0">{pScore} b</span>
                   </div>
                 )}
               </div>

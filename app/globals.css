@@ -548,3 +548,33 @@ body {
   border-radius: 0 999px 999px 0;
   transition: width 0.7s ease;
 }
+
+/* ── History chart bars ── */
+.chart-bar-me {
+  width: 12px;
+  border-radius: 3px 3px 0 0;
+  background: #22c55e;
+  height: var(--bar-h, 0px);
+  transition: height 0.5s ease;
+}
+.chart-bar-partner {
+  width: 12px;
+  border-radius: 3px 3px 0 0;
+  background: #c084fc;
+  height: var(--bar-h, 0px);
+  transition: height 0.5s ease;
+}
+.chart-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 32px;
+}
+.chart-container {
+  min-width: var(--chart-min-w, 0px);
+}
+.text-2xs {
+  font-size: 9px;
+  line-height: 1.4;
+}
