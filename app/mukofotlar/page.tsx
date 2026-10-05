@@ -18,6 +18,7 @@ import {
   type DailyAward,
   type CumulativeAward,
 } from '@/lib/awards';
+import { getMandatoryScore, getMandatoryTaskState, getMandatoryTasksForUser } from '@/lib/tasks';
 import type { DailyEntry, User } from '@/lib/types';
 
 const COLOR_MAP: Record<string, string> = {
@@ -46,6 +47,8 @@ export default function MukofotlarPage() {
   const [myEveningDone, setMyEveningDone] = useState<number[]>([]);
 
   const [myAwardHistory, setMyAwardHistory] = useState<Record<string, string>>({});
+  const [myMandatoryDone, setMyMandatoryDone] = useState<Record<string, boolean>>({});
+  const [partnerMandatoryDone, setPartnerMandatoryDone] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -74,6 +77,7 @@ export default function MukofotlarPage() {
         ]);
         setPartnerEntry(pEnt);
         setPartnerEntries(Array.isArray(pEnts) ? pEnts : []);
+        setPartnerMandatoryDone(getMandatoryTaskState(String(partnerUser.id)));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ma\'lumotlarni yuklashda xatolik');
@@ -93,6 +97,7 @@ export default function MukofotlarPage() {
 
     const history = getAwardHistory(session.id);
     setMyAwardHistory(history);
+    setMyMandatoryDone(getMandatoryTaskState(session.id));
 
     loadData(session.id);
   }, [router, loadData, todayStr]);
@@ -132,8 +137,13 @@ export default function MukofotlarPage() {
     );
   }
 
-  const myScore = computeDayScore(myEntry);
-  const partnerScore = partner ? computeDayScore(partnerEntry) : 0;
+  const myMandatoryTasks = user ? getMandatoryTasksForUser(user.name) : [];
+  const partnerMandatoryTasks = partner ? getMandatoryTasksForUser(partner.name) : [];
+  const myMandatoryScore = user ? getMandatoryScore(user.name, myMandatoryDone) : 0;
+  const partnerMandatoryScore = partner ? getMandatoryScore(partner.name, partnerMandatoryDone) : 0;
+
+  const myScore = computeDayScore(myEntry, myMandatoryScore);
+  const partnerScore = partner ? computeDayScore(partnerEntry, partnerMandatoryScore) : 0;
   const myLevel = getScoreLevel(myScore);
   const partnerLevel = getScoreLevel(partnerScore);
 
@@ -178,6 +188,57 @@ export default function MukofotlarPage() {
       </div>
 
       <div className="max-w-md mx-auto px-4 -mt-12 space-y-4 fade-in">
+
+        <div className="card p-5 shadow-xl">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <p className="text-xs font-black uppercase tracking-widest text-green-700">✅ Majburiy vazifalar</p>
+              <h2 className="text-lg font-black text-gray-800">Ball bilan hisobot</h2>
+            </div>
+            <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-700">
+              {myMandatoryScore} ball
+            </span>
+          </div>
+
+          <div className="space-y-2">
+            {myMandatoryTasks.map((task) => {
+              const done = Boolean(myMandatoryDone[task.id]);
+              return (
+                <div key={task.id} className={`flex items-center justify-between rounded-xl border p-3 ${done ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
+                  <div className="flex-1 min-w-0 pr-2">
+                    <p className={`text-sm font-bold ${done ? 'text-green-700' : 'text-gray-700'}`}>{task.label}</p>
+                    <p className="text-[10px] text-gray-500">{task.description}</p>
+                  </div>
+                  <span className="rounded-full bg-white px-2 py-1 text-[10px] font-black text-amber-600 border border-amber-200">
+                    {done ? '✓' : '—'} +{task.points}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          {partner && (
+            <div className="mt-4 border-t border-gray-100 pt-4">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm font-bold text-gray-700">{partner.name}</p>
+                <span className="text-[10px] font-bold bg-purple-50 text-purple-700 px-2 py-1 rounded-full">
+                  {partnerMandatoryScore} ball
+                </span>
+              </div>
+              {partnerMandatoryTasks.map((task) => {
+                const done = Boolean(partnerMandatoryDone[task.id]);
+                return (
+                  <div key={task.id} className={`flex items-center justify-between rounded-xl border p-2.5 mb-2 ${done ? 'bg-purple-50 border-purple-200' : 'bg-gray-50 border-gray-200'}`}>
+                    <div className="flex-1 min-w-0 pr-2">
+                      <p className={`text-xs font-bold ${done ? 'text-purple-700' : 'text-gray-700'}`}>{task.label}</p>
+                    </div>
+                    <span className="text-[10px] font-black text-purple-700">{done ? '✓' : '—'} +{task.points}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
         {/* ── TODAY SCORES ── */}
         <div className="card p-5 shadow-xl">

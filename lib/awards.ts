@@ -24,8 +24,8 @@ export interface CumulativeAward {
 // Scoring
 // ───────────────────────────────────────
 
-export function computeDayScore(entry: DailyEntry | null): number {
-  if (!entry) return 0;
+export function computeDayScore(entry: DailyEntry | null, mandatoryPoints = 0): number {
+  if (!entry) return mandatoryPoints;
   const prayers = [entry.bomdod, entry.peshin, entry.asr, entry.shom, entry.xufton].filter(Boolean).length;
   const zikr = entryZikr(entry);
   const salawat = entry.salawat_count || 0;
@@ -36,7 +36,7 @@ export function computeDayScore(entry: DailyEntry | null): number {
   score += Math.round(Math.min(zikr, 500) * 0.1);
   score += Math.round(Math.min(salawat, 500) * 0.1);
   score += Math.min(pages, 50) * 2;
-  return score;
+  return score + mandatoryPoints;
 }
 
 export function getScoreLevel(score: number): { emoji: string; label: string; colorClass: string; bgClass: string } {

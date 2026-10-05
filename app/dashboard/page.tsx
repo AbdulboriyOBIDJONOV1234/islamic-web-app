@@ -12,6 +12,7 @@ import { getEntryByDate, getAllUsers, getAllEntries } from '@/lib/supabase';
 import { getNiyat, setNiyat, getGoals, getNotifEnabled, setNotifEnabled } from '@/lib/local';
 import type { DailyEntry, User } from '@/lib/types';
 import { PRAYERS } from '@/lib/types';
+import { getMandatoryScore, getMandatoryTaskState, getMandatoryTasksForUser, toggleMandatoryTask } from '@/lib/tasks';
 import { format } from 'date-fns';
 
 export default function DashboardPage() {
@@ -25,6 +26,8 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [niyat, setNiyatState] = useState('');
   const [notifOn, setNotifOn] = useState(false);
+  const [myMandatoryDone, setMyMandatoryDone] = useState<Record<string, boolean>>({});
+  const [partnerMandatoryDone, setPartnerMandatoryDone] = useState<Record<string, boolean>>({});
   const [showBadges, setShowBadges] = useState(false);
   const [showGoals, setShowGoals] = useState(false);
   const [yearMonth] = useState(() => format(new Date(), 'yyyy-MM'));
@@ -64,11 +67,16 @@ export default function DashboardPage() {
     const session = getSession();
     if (!session) { router.replace('/'); return; }
     setUser(session);
+    setMyMandatoryDone(getMandatoryTaskState(session.id));
     loadData(session.id);
     setNiyatState(getNiyat(session.id, today()));
     setNotifOn(getNotifEnabled(session.id));
   }, [router, loadData]);
 
+  useEffect(() => {
+    if (!partner) return;
+    setPartnerMandatoryDone(getMandatoryTaskState(String(partner.id)));
+  }, [partner]);
   // Poll partner data every 30 seconds — works on any device/browser
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -86,6 +94,18 @@ export default function DashboardPage() {
     if (!user) return;
     setNiyatState(text);
     setNiyat(user.id, today(), text);
+  }
+
+  function handleMandatoryToggle(taskId: string, userId: string) {
+    const next = toggleMandatoryTask(userId, taskId);
+
+    if (user && String(user.id) === String(userId)) {
+      setMyMandatoryDone(next);
+    }
+
+    if (partner && String(partner.id) === String(userId)) {
+      setPartnerMandatoryDone(next);
+    }
   }
 
   async function toggleNotif() {
@@ -162,6 +182,13 @@ export default function DashboardPage() {
   const badges = calcBadges(allMyEntries, streak);
   const earnedBadges = badges.filter((b) => b.earned);
 
+  const myMandatoryTasks = user ? getMandatoryTasksForUser(user.name) : [];
+  const partnerMandatoryTasks = partner ? getMandatoryTasksForUser(partner.name) : [];
+  const myMandatoryDoneCount = myMandatoryTasks.filter((task) => myMandatoryDone[task.id]).length;
+  const partnerMandatoryDoneCount = partnerMandatoryTasks.filter((task) => partnerMandatoryDone[task.id]).length;
+  const myMandatoryScore = user ? getMandatoryScore(user.name, myMandatoryDone) : 0;
+  const partnerMandatoryScore = partner ? getMandatoryScore(partner.name, partnerMandatoryDone) : 0;
+
   const goals = getGoals(user?.id || '', yearMonth);
   const monthDhikr = allMyEntries
     .filter((e) => e.date.startsWith(yearMonth))
@@ -210,6 +237,40 @@ export default function DashboardPage() {
       </div>
 
       <div className="max-w-md mx-auto px-4 -mt-12 space-y-4 fade-in">
+
+        <div className="card p-5 shadow-xl">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <p className="text-xs font-black uppercase tracking-widest text-green-700">✅ Majburiy vazifalar</p>
+              <h2 className="text-lg font-black text-gray-800">Bugungi vazifa ro&apos;yxati</h2>
+            </div>
+            <div className="rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-700">
+              {myMandatoryDoneCount}/{myMandatoryTasks.length} · {myMandatoryScore} ball
+            </div>
+          </div>
+
+          <TaskList
+            title={user?.name || 'Siz'}
+            tasks={myMandatoryTasks}
+            doneMap={myMandatoryDone}
+            userId={user?.id || ''}
+            onToggle={handleMandatoryToggle}
+            canToggle={Boolean(user)}
+          />
+
+          {partner && (
+            <div className="mt-4 border-t border-gray-100 pt-4">
+              <TaskList
+                title={partner.name}
+                tasks={partnerMandatoryTasks}
+                doneMap={partnerMandatoryDone}
+                userId={String(partner.id)}
+                onToggle={handleMandatoryToggle}
+                canToggle={false}
+              />
+            </div>
+          )}
+        </div>
 
         {/* My today card */}
         <div className="card p-5 shadow-xl">
@@ -534,6 +595,67 @@ function GoalRow({ label, current, target, unit, color }: {
       <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
         <GoalFill pct={pct} color={color} />
       </div>
+    </div>
+  );
+}
+
+function TaskList({
+  title,
+  tasks,
+  doneMap,
+  userId,
+  onToggle,
+  canToggle,
+}: {
+  title: string;
+  tasks: { id: string; label: string; description: string; points: number }[];
+  doneMap: Record<string, boolean>;
+  userId: string;
+  onToggle: (taskId: string, userId: string) => void;
+  canToggle: boolean;
+}) {
+  const total = tasks.reduce((sum, task) => sum + (doneMap[task.id] ? task.points : 0), 0);
+  const done = tasks.filter((task) => doneMap[task.id]).length;
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-sm font-bold text-gray-700">{title}</p>
+        <span className="text-[10px] font-bold bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+          {done}/{tasks.length} · {total} ball
+        </span>
+      </div>
+
+      {tasks.map((task) => {
+        const checked = Boolean(doneMap[task.id]);
+
+        return (
+          <button
+            key={task.id}
+            type="button"
+            onClick={() => canToggle && userId && onToggle(task.id, userId)}
+            disabled={!canToggle || !userId}
+            className={`w-full flex items-center justify-between rounded-xl border p-3 text-left transition-all ${
+              checked
+                ? 'bg-green-50 border-green-200 text-green-700'
+                : 'bg-gray-50 border-gray-200 text-gray-700'
+            } ${canToggle ? 'hover:bg-green-50' : 'cursor-default'}`}
+          >
+            <div className="flex-1 min-w-0 pr-2">
+              <div className="flex items-center gap-2">
+                <span className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-black ${checked ? 'bg-green-600 text-white' : 'bg-white text-gray-400 border border-gray-300'}`}>
+                  {checked ? '✓' : '○'}
+                </span>
+                <span className="text-sm font-bold truncate">{task.label}</span>
+              </div>
+              <p className="text-[10px] text-gray-500 mt-1">{task.description}</p>
+            </div>
+            <span className="rounded-full bg-white px-2 py-1 text-[10px] font-black text-amber-600 border border-amber-200">
+              +{task.points}
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 }
