@@ -40,6 +40,7 @@ export const SALAWAT_OPTIONS = [
   { label: 'Allohumma solli ala Muhammad', arabic: 'اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ' },
   { label: 'Sollallohu alayhi vasallam', arabic: 'صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ' },
   { label: 'Allohumma solli va sallim', arabic: 'اللَّهُمَّ صَلِّ وَسَلِّمْ' },
+  { label: 'Astaghfirullah wa atubu ilaih', arabic: 'أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ' },
 ];
 
 export interface DailyStats {
@@ -77,6 +78,11 @@ export const SALAWAT_LIST = [
   {
     text: 'Sollallohu alayhi vasallam',
     arabic: 'صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ',
+    count: 100,
+  },
+  {
+    text: 'Astaghfirullah wa atubu ilaih',
+    arabic: 'أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ',
     count: 100,
   },
 ];
