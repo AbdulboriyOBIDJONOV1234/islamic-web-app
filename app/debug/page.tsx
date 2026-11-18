@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
-type U = { id: string; name: string };
+import { getAllUsers, getEntryByDate, getAllEntries } from '@/lib/supabase';
+import { today } from '@/lib/utils';
 
 export default function DebugPage() {
   const [out, setOut] = useState('yuklanmoqda...');
@@ -10,28 +10,40 @@ export default function DebugPage() {
   useEffect(() => {
     (async () => {
       const raw = localStorage.getItem('namoz_user');
-      const session: U | null = raw ? JSON.parse(raw) : null;
-      let status = 0;
-      let list: U[] = [];
-      let err = '';
+      const session = raw ? JSON.parse(raw) : null;
+      const r: Record<string, unknown> = { sessionId: session?.id, today: today() };
+      let partnerId = '';
+
       try {
-        const r = await fetch('/api/users', { cache: 'no-store' });
-        status = r.status;
-        const body = await r.json();
-        list = Array.isArray(body) ? body : [];
-      } catch (e) {
-        err = String(e);
+        const users = await getAllUsers();
+        r.users = users.map((u) => u.name);
+        const p = users.find((u) => String(u.id) !== String(session?.id));
+        r.partner = p ? p.name : null;
+        partnerId = p ? String(p.id) : '';
+      } catch (e) { r.usersError = String(e); }
+
+      try {
+        const e = await getEntryByDate(session?.id, today());
+        r.myTodayEntry = e ? 'bor' : 'yoq';
+      } catch (e) { r.myTodayError = String(e); }
+
+      try {
+        const e = await getAllEntries(session?.id);
+        r.myEntries = Array.isArray(e) ? e.length : typeof e;
+      } catch (e) { r.myEntriesError = String(e); }
+
+      if (partnerId) {
+        try {
+          const e = await getEntryByDate(partnerId, today());
+          r.partnerTodayEntry = e ? 'bor' : 'yoq';
+        } catch (e) { r.partnerTodayError = String(e); }
+        try {
+          const e = await getAllEntries(partnerId);
+          r.partnerEntries = Array.isArray(e) ? e.length : typeof e;
+        } catch (e) { r.partnerEntriesError = String(e); }
       }
-      const partner = list.find((u) => String(u.id) !== String(session?.id)) || null;
-      setOut(JSON.stringify({
-        origin: location.origin,
-        session,
-        usersStatus: status,
-        usersCount: list.length,
-        userNames: list.map((u) => u.name),
-        partner: partner ? partner.name : null,
-        err,
-      }, null, 2));
+
+      setOut(JSON.stringify(r, null, 2));
     })();
   }, []);
 
