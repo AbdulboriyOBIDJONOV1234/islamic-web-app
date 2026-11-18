@@ -19,7 +19,8 @@ import {
   type DailyAward,
   type CumulativeAward,
 } from '@/lib/awards';
-import { getMandatoryScore, getMandatoryTaskState, getMandatoryTasksForUser } from '@/lib/tasks';
+import { getTasksScore, getMandatoryTaskState, getMandatoryTasksForUser } from '@/lib/tasks';
+import { getCustomTasks, customToMandatory, type CustomTask } from '@/lib/customTasks';
 import type { DailyEntry, User } from '@/lib/types';
 
 const COLOR_MAP: Record<string, string> = {
@@ -37,6 +38,8 @@ export default function MukofotlarPage() {
   const router = useRouter();
   const [user, setUser] = useState<{ id: string; name: string } | null>(null);
   const [partner, setPartner] = useState<User | null>(null);
+  const [myCustomTasks, setMyCustomTasks] = useState<CustomTask[]>([]);
+  const [partnerCustomTasks, setPartnerCustomTasks] = useState<CustomTask[]>([]);
 
   const [myEntry, setMyEntry] = useState<DailyEntry | null>(null);
   const [partnerEntry, setPartnerEntry] = useState<DailyEntry | null>(null);
@@ -79,7 +82,9 @@ export default function MukofotlarPage() {
         setPartnerEntry(pEnt);
         setPartnerEntries(Array.isArray(pEnts) ? pEnts : []);
         setPartnerMandatoryDone(getMandatoryTaskState(String(partnerUser.id)));
+        setPartnerCustomTasks(await getCustomTasks(String(partnerUser.id)));
       }
+      setMyCustomTasks(await getCustomTasks(userId));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ma\'lumotlarni yuklashda xatolik');
     } finally {
@@ -140,10 +145,14 @@ export default function MukofotlarPage() {
     );
   }
 
-  const myMandatoryTasks = user ? getMandatoryTasksForUser(user.name) : [];
-  const partnerMandatoryTasks = partner ? getMandatoryTasksForUser(partner.name) : [];
-  const myMandatoryScore = user ? getMandatoryScore(user.name, myMandatoryDone) : 0;
-  const partnerMandatoryScore = partner ? getMandatoryScore(partner.name, partnerMandatoryDone) : 0;
+  const myMandatoryTasks = user
+    ? [...getMandatoryTasksForUser(user.name), ...myCustomTasks.map((t) => customToMandatory(t, user.name))]
+    : [];
+  const partnerMandatoryTasks = partner
+    ? [...getMandatoryTasksForUser(partner.name), ...partnerCustomTasks.map((t) => customToMandatory(t, partner.name))]
+    : [];
+  const myMandatoryScore = getTasksScore(myMandatoryTasks, myMandatoryDone);
+  const partnerMandatoryScore = getTasksScore(partnerMandatoryTasks, partnerMandatoryDone);
 
   const myScore = computeDayScore(myEntry, myMandatoryScore);
   const partnerScore = partner ? computeDayScore(partnerEntry, partnerMandatoryScore) : 0;

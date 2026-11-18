@@ -65,30 +65,6 @@ const DILAFRUZ_TASKS: MandatoryTask[] = [
     category: 'Nutq',
   },
   {
-    id: 'ona_tili',
-    label: 'Ona tili kursi vazifasi',
-    description: 'Kurs topshiriqi',
-    points: 20,
-    owner: 'Dilafruz',
-    category: 'Ta\'lim',
-  },
-  {
-    id: 'adabiyot',
-    label: 'Adabiyot o\'qish',
-    description: 'Kunlik o\'qish',
-    points: 20,
-    owner: 'Dilafruz',
-    category: 'Adabiyot',
-  },
-  {
-    id: 'arab_speaking',
-    label: 'Arab tili — speaking',
-    description: 'Suhbat va nutq mashqlari',
-    points: 20,
-    owner: 'Dilafruz',
-    category: 'Til',
-  },
-  {
     id: 'arab_markaz',
     label: 'Arab tili — markaz vazifasi',
     description: 'Markaz topshiriqi',
@@ -148,6 +124,13 @@ export function getMandatoryScore(
     if (doneMap[task.id]) return total + task.points;
     return total;
   }, 0);
+}
+
+export function getTasksScore(
+  tasks: { id: string; points: number }[],
+  doneMap: Record<string, boolean> = {},
+): number {
+  return tasks.reduce((total, task) => (doneMap[task.id] ? total + task.points : total), 0);
 }
 
 export function getMandatoryTaskState(userId: string): Record<string, boolean> {
