@@ -1,0 +1,813 @@
+@import "tailwindcss";
+
+/* ===================== DESIGN TOKENS ===================== */
+:root {
+  --green-deep: #0a2e1a;
+  --green-primary: #1a6b3c;
+  --green-light: #16a34a;
+  --gold: #d4a017;
+  --gold-light: #f0c040;
+  --cream: #faf8f2;
+  --card-bg: rgba(255,255,255,0.95);
+}
+
+body {
+  background: var(--cream);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  color: #1a1a1a;
+}
+
+/* 3D Kaaba olib tashlandi — tezlik uchun */
+
+/* ===================== BACKGROUNDS ===================== */
+.login-bg {
+  background: linear-gradient(160deg, #061a0e 0%, #0f4a28 40%, #1a6b3c 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 20% 15%, rgba(212,160,23,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 80% 25%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 50% 60%, rgba(212,160,23,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 10% 70%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 80%, rgba(212,160,23,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 35% 45%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 65% 35%, rgba(212,160,23,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 75% 90%, rgba(255,255,255,0.4) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.page-bg {
+  background: linear-gradient(180deg, #f0f7f2 0%, #faf8f2 100%);
+  min-height: 100vh;
+}
+
+.header-bg {
+  background: linear-gradient(135deg, #061a0e 0%, #0f4a28 60%, #1a6b3c 100%);
+}
+
+/* ===================== CARDS ===================== */
+.card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+  border: 1px solid rgba(26,107,60,0.08);
+}
+
+.card-glass {
+  background: rgba(255,255,255,0.12);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(212,160,23,0.3);
+  border-radius: 20px;
+}
+
+.card-gold {
+  background: linear-gradient(135deg, rgba(212,160,23,0.15), rgba(212,160,23,0.05));
+  border: 1px solid rgba(212,160,23,0.4);
+  border-radius: 16px;
+}
+
+/* ===================== BUTTONS ===================== */
+.btn-primary {
+  background: linear-gradient(135deg, #1a6b3c, #0f4a28);
+  color: white;
+  border-radius: 14px;
+  padding: 14px 24px;
+  font-weight: 700;
+  font-size: 16px;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  box-shadow: 0 4px 15px rgba(26,107,60,0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(26,107,60,0.4);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ===================== PRAYER BUTTONS ===================== */
+.prayer-btn {
+  border-radius: 14px;
+  padding: 12px 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  text-align: center;
+}
+
+.prayer-active {
+  background: linear-gradient(135deg, #1a6b3c, #16a34a);
+  color: white;
+  box-shadow: 0 4px 15px rgba(26,107,60,0.35);
+  transform: scale(1.03);
+}
+
+.prayer-inactive {
+  background: #f3f4f6;
+  color: #9ca3af;
+  border: 2px dashed #d1d5db;
+}
+
+/* ===================== INPUTS ===================== */
+.input-name {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid rgba(212,160,23,0.3);
+  border-radius: 14px;
+  font-size: 18px;
+  outline: none;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  transition: border-color 0.2s;
+}
+
+.input-name::placeholder { color: rgba(255,255,255,0.4); }
+
+.input-name:focus,
+.input-name.has-value {
+  border-color: #d4a017;
+  background: rgba(255,255,255,0.15);
+}
+
+.number-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 24px;
+  font-weight: 700;
+  outline: none;
+  text-align: center;
+  color: #1a6b3c;
+  background: #f0faf4;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+
+.number-input:focus { border-color: #1a6b3c; }
+
+.quick-btn {
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1.5px solid #d1fae5;
+  background: #f0faf4;
+  color: #1a6b3c;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.quick-btn:hover {
+  background: #1a6b3c;
+  color: white;
+}
+
+.quick-btn-sm {
+  font-size: 10px;
+  padding: 2px 6px;
+}
+
+.book-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #fde68a;
+  border-radius: 12px;
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  color: #92400e;
+  background: #fffbeb;
+  outline: none;
+}
+
+.book-input:focus { border-color: #f59e0b; }
+
+.dhikr-input {
+  width: 80px;
+  padding: 8px 10px;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  color: #1a6b3c;
+  background: #f0faf4;
+  outline: none;
+}
+
+.dhikr-input:focus { border-color: #1a6b3c; }
+
+/* ===================== NAVIGATION ===================== */
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  transition: all 0.2s;
+  text-decoration: none;
+  color: #9ca3af;
+}
+
+.nav-item-active {
+  background: rgba(26,107,60,0.12);
+  color: #1a6b3c;
+}
+
+/* ===================== DHIKR CARD ===================== */
+.dhikr-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.dhikr-row:last-child { border-bottom: none; }
+
+.dhikr-arabic {
+  direction: rtl;
+  font-size: 14px;
+  color: #6b7280;
+  text-align: right;
+}
+
+/* ===================== PROGRESS ===================== */
+.progress-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #1a6b3c, #16a34a);
+  transition: width 0.6s ease;
+  width: var(--progress-width, 0%);
+}
+
+/* ===================== ANIMATIONS ===================== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.fade-in { animation: fadeIn 0.4s ease-out; }
+
+.gold-text {
+  background: linear-gradient(90deg, #d4a017, #f0c040, #d4a017);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
+
+/* ===================== LOGIN ===================== */
+.login-title { color: #0f4a28; }
+
+/* ===================== ENTRY ===================== */
+.entry-bg { background: linear-gradient(180deg, #f0f7f2 0%, #faf8f2 100%); }
+
+.gold-salawat { color: #f0c040; }
+.btn-entry-link { background: linear-gradient(135deg, #1a6b3c, #0f4a28); }
+.gold-arabic { color: #d4a017; direction: rtl; }
+
+/* ===================== STAT MINI ===================== */
+.stat-mini-green  { background: #f0fdf4; color: #166534; }
+.stat-mini-gold   { background: #fffbeb; color: #92400e; }
+.stat-mini-purple { background: #faf5ff; color: #6b21a8; }
+
+/* ===================== STREAK ===================== */
+.streak-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 160, 0, 0.15);
+  border: 1px solid rgba(255, 160, 0, 0.35);
+  border-radius: 12px;
+  padding: 8px 14px;
+  color: #ffd060;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ===================== NIYAT ===================== */
+.niyat-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid #e5e7eb;
+  border-radius: 14px;
+  font-size: 14px;
+  outline: none;
+  background: #f9fafb;
+  color: #1a1a1a;
+  resize: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+
+.niyat-input:focus { border-color: #1a6b3c; background: #f0faf4; }
+
+.niyat-input::placeholder { color: #9ca3af; }
+
+/* ===================== BADGES ===================== */
+.badge-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  transition: all 0.15s;
+}
+
+.badge-earned {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.badge-locked {
+  background: #f9fafb;
+  border: 1px solid #f3f4f6;
+  opacity: 0.7;
+}
+
+/* ===================== GOAL FILL ===================== */
+.goal-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.6s ease;
+  width: var(--goal-width, 0%);
+}
+
+.goal-fill-green   { background: #16a34a; }
+.goal-fill-teal    { background: #0d9488; }
+.goal-fill-emerald { background: #10b981; }
+.goal-fill-amber   { background: #f59e0b; }
+
+.goal-number-input {
+  width: 100px;
+  padding: 8px 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  color: #1a6b3c;
+  background: #f0faf4;
+  outline: none;
+}
+
+.goal-number-input:focus { border-color: #1a6b3c; }
+
+/* ===================== CALENDAR HEATMAP ===================== */
+.heat-cell {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.heat-month-label {
+  font-size: 8px;
+  color: #9ca3af;
+  text-align: center;
+  overflow: hidden;
+}
+
+.heat-empty { background: transparent; }
+.heat-none  { background: #e5e7eb; }
+.heat-1     { background: #bbf7d0; }
+.heat-3     { background: #4ade80; }
+.heat-5     { background: #15803d; }
+
+/* ===================== QURAN PAGE ===================== */
+.quran-progress-bar {
+  height: 10px;
+  border-radius: 5px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+
+.quran-progress-fill {
+  height: 100%;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #1a6b3c, #22c55e);
+  transition: width 0.6s ease;
+  width: var(--progress-width, 0%);
+}
+
+.surah-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 4px;
+}
+
+.surah-cell {
+  aspect-ratio: 1;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+}
+
+.surah-done {
+  background: #15803d;
+  color: white;
+  transform: scale(1.05);
+}
+
+.surah-undone {
+  background: #f3f4f6;
+  color: #9ca3af;
+}
+
+.surah-undone:hover { background: #d1fae5; color: #15803d; }
+
+.surah-legend-done {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background: #15803d;
+}
+
+.surah-legend-undone {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+}
+
+.popular-surah-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+}
+
+.popular-surah-done   { background: #f0fdf4; border: 1.5px solid #86efac; }
+.popular-surah-undone { background: #f9fafb; border: 1.5px solid #e5e7eb; }
+
+.popular-surah-undone:hover { background: #f0fdf4; }
+
+/* ===================== DUA CHECKLIST ===================== */
+.dua-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  width: 100%;
+  border: none;
+  text-align: left;
+}
+
+.dua-done   { background: #f0fdf4; }
+.dua-undone { background: #f9fafb; border: 1px solid #f3f4f6; }
+.dua-undone:hover { background: #f0fdf4; }
+
+.dua-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 900;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.dua-check-done   { background: #15803d; color: white; }
+.dua-check-indigo { background: #6366f1; color: white; }
+.dua-check-undone { background: #e5e7eb; color: transparent; border: 2px solid #d1d5db; }
+
+/* ===================== MUKOFOTLAR ===================== */
+.award-score-bar {
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #f3f4f6;
+  display: flex;
+}
+
+.award-score-me {
+  height: 100%;
+  background: linear-gradient(90deg, #16a34a, #15803d);
+  border-radius: 999px 0 0 999px;
+  transition: width 0.7s ease;
+}
+
+.award-score-partner {
+  height: 100%;
+  background: linear-gradient(90deg, #a855f7, #7c3aed);
+  border-radius: 0 999px 999px 0;
+  transition: width 0.7s ease;
+}
+
+/* ── History chart bars ── */
+.chart-bar-me {
+  width: 12px;
+  border-radius: 3px 3px 0 0;
+  background: #22c55e;
+  height: var(--bar-h, 0px);
+  transition: height 0.5s ease;
+}
+.chart-bar-partner {
+  width: 12px;
+  border-radius: 3px 3px 0 0;
+  background: #c084fc;
+  height: var(--bar-h, 0px);
+  transition: height 0.5s ease;
+}
+.chart-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 40px;
+}
+.chart-container {
+  min-width: var(--chart-min-w, 0px);
+}
+.text-2xs {
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+/* =====================================================================
+   3D · KREATIV DIZAYN QATLAMI  (yuqoridagi stillarni boyitadi)
+   ===================================================================== */
+:root {
+  --night: #04140c;
+  --emerald: #0f4a28;
+  --glow: 0 0 28px rgba(240,192,64,.35);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cpath d='M40 6l8 14 16-2-8 14 14 8-14 8 8 14-16-2-8 14-8-14-16 2 8-14-14-8 14-8-8-14 16 2z' fill='none' stroke='%231a6b3c' stroke-opacity='.07' stroke-width='1'/%3E%3C/svg%3E") ,
+    var(--cream);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- 3D sahna (login) ---------- */
+.scene { perspective: 1100px; perspective-origin: 50% 40%; }
+
+.login-bg {
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(240,192,64,.18), transparent 55%),
+    radial-gradient(ellipse at 80% 90%, rgba(22,163,74,.25), transparent 50%),
+    linear-gradient(160deg, #03100a 0%, #0b3b20 45%, #14582f 100%);
+}
+
+/* uchib yuruvchi yulduzlar */
+.stars, .stars::before, .stars::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    radial-gradient(2px 2px at 12% 18%, #f0c040, transparent),
+    radial-gradient(1.5px 1.5px at 78% 12%, #fff, transparent),
+    radial-gradient(2px 2px at 55% 70%, #f0c040, transparent),
+    radial-gradient(1.5px 1.5px at 22% 82%, #fff, transparent),
+    radial-gradient(2px 2px at 90% 60%, #f0c040, transparent),
+    radial-gradient(1.5px 1.5px at 40% 35%, #fff, transparent);
+  animation: twinkle 4s ease-in-out infinite;
+}
+.stars::before { transform: translateZ(-120px) scale(1.4); animation-delay: -1.3s; opacity: .7; }
+.stars::after  { transform: translateZ(-240px) scale(1.9); animation-delay: -2.6s; opacity: .5; }
+@keyframes twinkle { 0%,100% { opacity: .35 } 50% { opacity: 1 } }
+
+/* ---------- Ka'ba 3D ---------- */
+.kaaba-scene { width: 150px; height: 150px; margin: 0 auto; perspective: 700px; }
+.kaaba-wrap  { width: 100%; height: 100%; transform-style: preserve-3d;
+               transform: rotateX(-18deg); animation: floaty 5s ease-in-out infinite; }
+.kaaba-cube  { position: relative; width: 100px; height: 100px; margin: 25px auto 0;
+               transform-style: preserve-3d; animation: spinY 16s linear infinite; }
+.k-face { position: absolute; width: 100px; height: 100px; overflow: hidden;
+          background: linear-gradient(145deg, #1b1b1b, #050505);
+          border: 1px solid rgba(240,192,64,.25);
+          box-shadow: inset 0 0 22px rgba(0,0,0,.9); }
+.k-front  { transform: translateZ(50px); }
+.k-back   { transform: rotateY(180deg) translateZ(50px); }
+.k-left   { transform: rotateY(-90deg) translateZ(50px); }
+.k-right  { transform: rotateY(90deg)  translateZ(50px); }
+.k-top    { transform: rotateX(90deg)  translateZ(50px); background: #0a0a0a; }
+.k-bottom { transform: rotateX(-90deg) translateZ(50px); }
+.k-band { position: absolute; left: 0; right: 0; top: 22%; height: 12%;
+          background: linear-gradient(90deg, #8a6508, #f0c040, #8a6508);
+          box-shadow: 0 0 10px rgba(240,192,64,.6); }
+.k-door { position: absolute; left: 18%; bottom: 0; width: 26%; height: 46%;
+          background: linear-gradient(180deg, #f0c040, #a67c0b);
+          border-radius: 4px 4px 0 0; box-shadow: 0 0 14px rgba(240,192,64,.6); }
+@keyframes spinY  { to { transform: rotateY(360deg) } }
+@keyframes floaty { 0%,100% { translate: 0 0 } 50% { translate: 0 -8px } }
+
+/* Ka'ba tagidagi nurli doira */
+.kaaba-glow { width: 190px; height: 38px; margin: -6px auto 0;
+  background: radial-gradient(ellipse, rgba(240,192,64,.55), transparent 70%);
+  filter: blur(4px); animation: pulse 3s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity: .6; transform: scale(.9) } 50% { opacity: 1; transform: scale(1.05) } }
+
+/* oy 3D aylanadi */
+.moon3d { display: inline-block; font-size: 44px; transform-style: preserve-3d;
+          animation: moonTurn 8s ease-in-out infinite;
+          filter: drop-shadow(0 0 14px rgba(240,192,64,.8)); }
+@keyframes moonTurn { 0%,100% { transform: rotateY(-35deg) } 50% { transform: rotateY(35deg) } }
+
+/* ---------- Tilt kartochka (login) ---------- */
+.tilt { transform-style: preserve-3d; transition: transform .15s ease-out; will-change: transform; }
+.tilt > * { transform: translateZ(24px); }
+.card-glass {
+  background: linear-gradient(145deg, rgba(255,255,255,.16), rgba(255,255,255,.05));
+  border: 1px solid rgba(240,192,64,.35);
+  box-shadow: 0 30px 60px -20px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.25);
+}
+
+/* ---------- Sarlavha (header) 3D ---------- */
+.header-bg {
+  position: relative; overflow: hidden;
+  background:
+    radial-gradient(circle at 85% 10%, rgba(240,192,64,.28), transparent 45%),
+    linear-gradient(135deg, #03100a 0%, #0c4023 55%, #1a6b3c 100%);
+  border-bottom-left-radius: 36px; border-bottom-right-radius: 36px;
+  box-shadow: 0 18px 40px -16px rgba(10,46,26,.55);
+}
+.header-bg::before {           /* aylanuvchi 8 qirrali yulduz */
+  content: '✦'; position: absolute; right: -18px; top: -26px; font-size: 150px; line-height: 1;
+  color: rgba(240,192,64,.14); animation: spinSlow 30s linear infinite; pointer-events: none;
+}
+.header-bg::after {
+  content: ''; position: absolute; left: -40px; bottom: -60px; width: 200px; height: 200px;
+  border-radius: 50%; background: radial-gradient(circle, rgba(34,197,94,.25), transparent 65%);
+  pointer-events: none;
+}
+.header-bg > * { position: relative; z-index: 1; }
+@keyframes spinSlow { to { transform: rotate(360deg) } }
+
+/* ---------- Kartochkalar: chuqurlik ---------- */
+.card {
+  border-radius: 24px; border: 1px solid rgba(26,107,60,.10);
+  box-shadow: 0 1px 0 #fff inset, 0 2px 4px rgba(10,46,26,.05),
+              0 14px 28px -10px rgba(10,46,26,.18);
+  transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s;
+}
+@media (hover: hover) {
+  .card:hover { transform: perspective(900px) translateY(-4px) rotateX(2deg);
+    box-shadow: 0 1px 0 #fff inset, 0 24px 40px -14px rgba(10,46,26,.30); }
+}
+.card-gold { box-shadow: var(--glow), 0 12px 24px -12px rgba(212,160,23,.5); }
+
+/* ---------- 3D tugmalar ("klaviatura tugmasi") ---------- */
+.btn-primary {
+  background: linear-gradient(180deg, #22a455, #137a3c);
+  box-shadow: 0 6px 0 #0a4a24, 0 14px 22px -6px rgba(10,74,36,.55);
+  transition: transform .12s, box-shadow .12s;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 0 #0a4a24, 0 18px 26px -6px rgba(10,74,36,.55); }
+.btn-primary:active { transform: translateY(5px); box-shadow: 0 1px 0 #0a4a24, 0 4px 8px rgba(10,74,36,.4); }
+.btn-primary:disabled { box-shadow: 0 3px 0 #0a4a24; transform: none; }
+
+.prayer-btn { transition: transform .12s, box-shadow .12s, background .2s; }
+.prayer-active {
+  background: linear-gradient(180deg, #2bbd63, #15803d);
+  box-shadow: 0 5px 0 #0a4a24, 0 12px 18px -6px rgba(10,74,36,.5);
+  transform: translateY(-2px);
+}
+.prayer-inactive { box-shadow: 0 4px 0 #d1d5db; background: #f7f7f8; }
+.prayer-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,.2); }
+
+.quick-btn { box-shadow: 0 3px 0 #bbf7d0; }
+.quick-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #bbf7d0; }
+
+/* ---------- Suzuvchi 3D pastki panel (dock) ---------- */
+.dock {
+  position: fixed; left: 50%; bottom: 14px; z-index: 50;
+  transform: translateX(-50%); width: min(94vw, 440px);
+  display: flex; justify-content: space-around; padding: 8px 6px;
+  background: rgba(6,26,14,.82);
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+  border: 1px solid rgba(240,192,64,.35); border-radius: 28px;
+  box-shadow: 0 20px 40px -10px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.12);
+}
+.dock .nav-item { color: rgba(255,255,255,.55); transition: transform .25s cubic-bezier(.2,.8,.2,1), color .2s; }
+.dock .nav-item span:first-child { transition: transform .25s; filter: grayscale(.6); }
+.dock .nav-item:hover { color: #fff; }
+.dock .nav-item-active {
+  background: linear-gradient(180deg, rgba(240,192,64,.28), rgba(240,192,64,.08));
+  color: #f0c040; transform: translateY(-8px);
+  box-shadow: 0 10px 18px -6px rgba(240,192,64,.45), inset 0 1px 0 rgba(255,255,255,.25);
+}
+.dock .nav-item-active span:first-child { transform: scale(1.3) translateZ(20px); filter: none; }
+
+/* sahifa kirishi */
+.fade-in { animation: riseIn .55s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes riseIn { from { opacity: 0; transform: perspective(800px) translateY(24px) rotateX(-8deg); }
+                    to   { opacity: 1; transform: none; } }
+
+/* harakatni kamaytirishni xohlaganlar uchun */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* =====================================================================
+   FOTO FONLAR
+   ===================================================================== */
+
+/* --- Kirish sahifasi: tungi Ka'ba, orqadan sekin zoom bo'lib keladi --- */
+.photo-stage { position: absolute; inset: 0; overflow: hidden; background: #020a06; }
+.photo-stage .photo {
+  position: absolute; inset: -4%; filter: brightness(1.18) contrast(1.08) saturate(1.1);
+  background: url('/images/kaaba-night.jpg') center 30% / cover no-repeat;
+  transform: scale(1.25);
+  animation: zoomIn 9s cubic-bezier(.16,.84,.3,1) forwards, breathe 18s ease-in-out 9s infinite alternate;
+  will-change: transform;
+}
+.photo-stage::after {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 35%, transparent 35%, rgba(2,10,6,.28) 90%),
+    linear-gradient(180deg, rgba(2,10,6,.05) 0%, rgba(2,10,6,.05) 55%, rgba(2,10,6,.55) 100%);
+}
+@keyframes zoomIn  { from { transform: scale(1.25); opacity: .5 } to { transform: scale(1); opacity: 1 } }
+@keyframes breathe { from { transform: scale(1) } to { transform: scale(1.07) } }
+
+/* --- Ichki sahifa (Bugun): Ka'baga cho'zilgan qo'llar --- */
+.header-photo::before {
+  content: ''; position: absolute; inset: 0; right: auto; top: 0; font-size: 0;
+  width: 100%; height: 100%; animation: none;
+  background: url('/images/hands-kaaba.jpg') 50% 36% / cover no-repeat;
+  transform: scale(1.35); animation: zoomInHdr 5s cubic-bezier(.16,.84,.3,1) forwards;
+  z-index: 0;
+}
+.header-photo::after {
+  left: 0; bottom: 0; width: 100%; height: 100%; border-radius: 0; z-index: 0;
+  background:
+    linear-gradient(180deg, rgba(3,16,10,.55) 0%, rgba(3,16,10,.35) 45%, rgba(6,40,22,.92) 100%);
+}
+@keyframes zoomInHdr { from { transform: scale(1.35) } to { transform: scale(1.02) } }
+
+/* --- Login kartochkasi: foni xiralashtirmaydi, rasm ko'rinib turadi --- */
+.card-glass {
+  background: linear-gradient(145deg, rgba(4,20,12,.52), rgba(4,20,12,.34));
+  -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+}
+
+/* --- Barcha ichki sahifalarning orqa foni: yengil Ka'ba rasmi --- */
+.page-bg { position: relative; background: #eef6f0; }
+.page-bg::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(238,246,240,.80) 0%, rgba(238,246,240,.90) 100%),
+    url('/images/kaaba-night.jpg') center / cover no-repeat;
+}
+.page-bg > *:not(.dock) { position: relative; z-index: 1; }
+
+/* sarlavhadagi tugmalar rasm ustida ham o'qilsin */
+.header-photo button, .header-photo p { text-shadow: 0 1px 6px rgba(0,0,0,.7); }
+.header-photo button { background-color: rgba(3,16,10,.45); }
