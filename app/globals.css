@@ -762,19 +762,19 @@ body {
 /* --- Kirish sahifasi: tungi Ka'ba, orqadan sekin zoom bo'lib keladi --- */
 .photo-stage { position: absolute; inset: 0; overflow: hidden; background: #020a06; }
 .photo-stage .photo {
-  position: absolute; inset: -4%;
+  position: absolute; inset: -4%; filter: brightness(1.18) contrast(1.08) saturate(1.1);
   background: url('/images/kaaba-night.jpg') center 30% / cover no-repeat;
-  transform: scale(1.45);
+  transform: scale(1.25);
   animation: zoomIn 9s cubic-bezier(.16,.84,.3,1) forwards, breathe 18s ease-in-out 9s infinite alternate;
   will-change: transform;
 }
 .photo-stage::after {
   content: ''; position: absolute; inset: 0;
   background:
-    radial-gradient(ellipse at 50% 35%, transparent 20%, rgba(2,10,6,.55) 75%),
-    linear-gradient(180deg, rgba(2,10,6,.35) 0%, rgba(2,10,6,.25) 40%, rgba(2,10,6,.88) 100%);
+    radial-gradient(ellipse at 50% 35%, transparent 35%, rgba(2,10,6,.28) 90%),
+    linear-gradient(180deg, rgba(2,10,6,.05) 0%, rgba(2,10,6,.05) 55%, rgba(2,10,6,.55) 100%);
 }
-@keyframes zoomIn  { from { transform: scale(1.45); opacity: .4 } to { transform: scale(1); opacity: 1 } }
+@keyframes zoomIn  { from { transform: scale(1.25); opacity: .5 } to { transform: scale(1); opacity: 1 } }
 @keyframes breathe { from { transform: scale(1) } to { transform: scale(1.07) } }
 
 /* --- Ichki sahifa (Bugun): Ka'baga cho'zilgan qo'llar --- */
@@ -791,3 +791,23 @@ body {
     linear-gradient(180deg, rgba(3,16,10,.55) 0%, rgba(3,16,10,.35) 45%, rgba(6,40,22,.92) 100%);
 }
 @keyframes zoomInHdr { from { transform: scale(1.35) } to { transform: scale(1.02) } }
+
+/* --- Login kartochkasi: foni xiralashtirmaydi, rasm ko'rinib turadi --- */
+.card-glass {
+  background: linear-gradient(145deg, rgba(4,20,12,.52), rgba(4,20,12,.34));
+  -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+}
+
+/* --- Barcha ichki sahifalarning orqa foni: yengil Ka'ba rasmi --- */
+.page-bg { position: relative; background: #eef6f0; }
+.page-bg::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(238,246,240,.80) 0%, rgba(238,246,240,.90) 100%),
+    url('/images/kaaba-night.jpg') center / cover no-repeat;
+}
+.page-bg > *:not(.dock) { position: relative; z-index: 1; }
+
+/* sarlavhadagi tugmalar rasm ustida ham o'qilsin */
+.header-photo button, .header-photo p { text-shadow: 0 1px 6px rgba(0,0,0,.7); }
+.header-photo button { background-color: rgba(3,16,10,.45); }
