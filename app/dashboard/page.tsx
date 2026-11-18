@@ -205,7 +205,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen pb-28 page-bg">
       {/* Header */}
-      <div className="header-bg text-white px-4 pt-10 pb-20">
+      <div className="header-bg header-photo text-white px-4 pt-10 pb-24">
         <div className="max-w-md mx-auto">
           <div className="flex justify-between items-start mb-3">
             <div>

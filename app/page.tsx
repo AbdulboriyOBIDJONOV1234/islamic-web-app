@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { setSession } from '@/lib/utils';
-import Kaaba3D from '@/components/Kaaba3D';
 import Tilt from '@/components/Tilt';
 
 type Step = 'name' | 'login' | 'register';
@@ -89,14 +88,13 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen login-bg scene flex flex-col items-center justify-center px-4 relative overflow-hidden">
-      <div className="stars" />
+    <div className="min-h-screen scene flex flex-col items-center justify-center px-4 relative overflow-hidden">
+      <div className="photo-stage"><div className="photo" /></div>
       <div className="w-full max-w-sm fade-in relative z-10">
 
         {/* Header */}
         <div className="text-center mb-8">
-          <Kaaba3D />
-          <div className="moon3d mt-2">☽</div>
+          <div className="moon3d">☽</div>
           <h1 className="text-3xl font-black gold-text mb-1">بِسْمِ اللَّهِ</h1>
           <p className="text-green-300 text-xs tracking-widest">BISMILLOHIR ROHMANIR ROHIYM</p>
         </div>
