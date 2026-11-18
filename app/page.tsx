@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { setSession } from '@/lib/utils';
+import Kaaba3D from '@/components/Kaaba3D';
+import Tilt from '@/components/Tilt';
 
 type Step = 'name' | 'login' | 'register';
 type Eye = 'password' | 'text';
@@ -17,13 +19,13 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const ALLOWED = ['abdulboriy', 'mohinur'];
+  const ALLOWED = ['abdulboriy', 'dilafruz'];
 
   async function handleNameNext() {
     const trimmed = name.trim();
     if (!trimmed) { setError('Ismingizni kiriting'); return; }
     if (!ALLOWED.includes(trimmed.toLowerCase())) {
-      setError('Bu ilova faqat Abdulboriy va Mohinur uchun');
+      setError('Bu ilova faqat Abdulboriy va Dilafruz uchun');
       return;
     }
     setLoading(true);
@@ -87,18 +89,20 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen login-bg flex flex-col items-center justify-center px-4">
-      <div className="w-full max-w-sm fade-in">
+    <div className="min-h-screen login-bg scene flex flex-col items-center justify-center px-4 relative overflow-hidden">
+      <div className="stars" />
+      <div className="w-full max-w-sm fade-in relative z-10">
 
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="text-5xl mb-3">☽</div>
+          <Kaaba3D />
+          <div className="moon3d mt-2">☽</div>
           <h1 className="text-3xl font-black gold-text mb-1">بِسْمِ اللَّهِ</h1>
           <p className="text-green-300 text-xs tracking-widest">BISMILLOHIR ROHMANIR ROHIYM</p>
         </div>
 
         {/* Card */}
-        <div className="card-glass p-7">
+        <Tilt className="card-glass p-7">
           <h2 className="text-xl font-black text-white text-center mb-1">Namoz Tracker</h2>
           <p className="text-green-300 text-xs text-center mb-6">Kunlik namoz · Zikr · Salovat · Kitob</p>
 
@@ -214,7 +218,7 @@ export default function LoginPage() {
               </button>
             </div>
           )}
-        </div>
+        </Tilt>
 
         <div className="text-center mt-6">
           <p className="gold-salawat text-lg">اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ</p>

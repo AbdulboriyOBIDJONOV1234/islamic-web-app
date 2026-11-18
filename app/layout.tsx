@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Namoz Tracker | Zikr & Salovat",
+  title: "Abdulboriy & Dilafruz | Namoz · Zikr · Salovat",
   description: "Kunlik namoz, zikr va salovotlarni kuzatib boring",
 };
 

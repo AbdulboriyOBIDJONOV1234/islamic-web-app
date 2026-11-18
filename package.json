@@ -1,12 +1,13 @@
 {
-  "name": "namoz-tracker",
+  "name": "islamic-web-app",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:reset": "node scripts/reset-db.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

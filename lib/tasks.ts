@@ -1,4 +1,4 @@
-export type MandatoryTaskOwner = 'Abdulboriy' | 'Mohinur' | 'both';
+export type MandatoryTaskOwner = 'Abdulboriy' | 'Dilafruz' | 'both';
 
 export interface MandatoryTask {
   id: string;
@@ -47,13 +47,13 @@ const ABDULBORIY_TASKS: MandatoryTask[] = [
   },
 ];
 
-const MOHINUR_TASKS: MandatoryTask[] = [
+const DILAFRUZ_TASKS: MandatoryTask[] = [
   {
     id: 'suhbat_kitobi',
     label: 'Suhbat kitobi',
     description: '1 ta mavzu',
     points: 20,
-    owner: 'Mohinur',
+    owner: 'Dilafruz',
     category: 'Kitob',
   },
   {
@@ -61,7 +61,7 @@ const MOHINUR_TASKS: MandatoryTask[] = [
     label: 'Zoom / speaking',
     description: '1 ta mavzu',
     points: 20,
-    owner: 'Mohinur',
+    owner: 'Dilafruz',
     category: 'Nutq',
   },
   {
@@ -69,7 +69,7 @@ const MOHINUR_TASKS: MandatoryTask[] = [
     label: 'Ona tili kursi vazifasi',
     description: 'Kurs topshiriqi',
     points: 20,
-    owner: 'Mohinur',
+    owner: 'Dilafruz',
     category: 'Ta\'lim',
   },
   {
@@ -77,7 +77,7 @@ const MOHINUR_TASKS: MandatoryTask[] = [
     label: 'Adabiyot o\'qish',
     description: 'Kunlik o\'qish',
     points: 20,
-    owner: 'Mohinur',
+    owner: 'Dilafruz',
     category: 'Adabiyot',
   },
   {
@@ -85,7 +85,7 @@ const MOHINUR_TASKS: MandatoryTask[] = [
     label: 'Arab tili — speaking',
     description: 'Suhbat va nutq mashqlari',
     points: 20,
-    owner: 'Mohinur',
+    owner: 'Dilafruz',
     category: 'Til',
   },
   {
@@ -93,7 +93,7 @@ const MOHINUR_TASKS: MandatoryTask[] = [
     label: 'Arab tili — markaz vazifasi',
     description: 'Markaz topshiriqi',
     points: 20,
-    owner: 'Mohinur',
+    owner: 'Dilafruz',
     category: 'Til',
   },
   {
@@ -101,7 +101,7 @@ const MOHINUR_TASKS: MandatoryTask[] = [
     label: 'Qur\'on hatm',
     description: 'Kuniga 4 bet',
     points: 25,
-    owner: 'Mohinur',
+    owner: 'Dilafruz',
     category: 'Qur\'on',
   },
   {
@@ -109,7 +109,7 @@ const MOHINUR_TASKS: MandatoryTask[] = [
     label: 'Vaqea surasi',
     description: 'O\'qish / yodlash',
     points: 15,
-    owner: 'Mohinur',
+    owner: 'Dilafruz',
     category: 'Qur\'on',
   },
   {
@@ -117,7 +117,7 @@ const MOHINUR_TASKS: MandatoryTask[] = [
     label: 'Mulk surasi',
     description: 'O\'qish / yodlash',
     points: 15,
-    owner: 'Mohinur',
+    owner: 'Dilafruz',
     category: 'Qur\'on',
   },
 ];
@@ -133,8 +133,8 @@ export function getMandatoryTasksForUser(userName: string): MandatoryTask[] {
     return [...COMMON_TASKS, ...ABDULBORIY_TASKS];
   }
 
-  if (normalized.includes('mohinur')) {
-    return [...COMMON_TASKS, ...MOHINUR_TASKS];
+  if (normalized.includes('dilafruz')) {
+    return [...COMMON_TASKS, ...DILAFRUZ_TASKS];
   }
 
   return [...COMMON_TASKS];

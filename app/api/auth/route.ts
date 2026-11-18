@@ -4,7 +4,7 @@ import getDb from '@/lib/db';
 
 type Row = Record<string, unknown>;
 
-const ALLOWED = ['abdulboriy', 'mohinur'];
+const ALLOWED = ['abdulboriy', 'dilafruz'];
 
 export async function POST(req: NextRequest) {
   const sql = getDb();
