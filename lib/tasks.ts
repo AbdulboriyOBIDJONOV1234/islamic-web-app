@@ -49,38 +49,6 @@ const ABDULBORIY_TASKS: MandatoryTask[] = [
 
 const DILAFRUZ_TASKS: MandatoryTask[] = [
   {
-    id: 'suhbat_kitobi',
-    label: 'Suhbat kitobi',
-    description: '1 ta mavzu',
-    points: 20,
-    owner: 'Dilafruz',
-    category: 'Kitob',
-  },
-  {
-    id: 'zoom_speaking',
-    label: 'Zoom / speaking',
-    description: '1 ta mavzu',
-    points: 20,
-    owner: 'Dilafruz',
-    category: 'Nutq',
-  },
-  {
-    id: 'arab_markaz',
-    label: 'Arab tili — markaz vazifasi',
-    description: 'Markaz topshiriqi',
-    points: 20,
-    owner: 'Dilafruz',
-    category: 'Til',
-  },
-  {
-    id: 'quran_4',
-    label: 'Qur\'on hatm',
-    description: 'Kuniga 4 bet',
-    points: 25,
-    owner: 'Dilafruz',
-    category: 'Qur\'on',
-  },
-  {
     id: 'voqea',
     label: 'Vaqea surasi',
     description: 'O\'qish / yodlash',
