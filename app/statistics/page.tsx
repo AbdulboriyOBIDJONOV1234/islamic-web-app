@@ -17,6 +17,7 @@ function ProgressFill({ pct }: { pct: number }) {
 import Navigation from '@/components/Navigation';
 import { getSession, today, getMonthRange, getYearRange, buildChartData, calcTotals, formatDisplayDate } from '@/lib/utils';
 import { getEntriesByRange, getAllUsers, getAllEntries } from '@/lib/supabase';
+import { useAutoReload } from '@/lib/useAutoReload';
 import type { DailyEntry, User } from '@/lib/types';
 import { format, subDays, eachDayOfInterval } from 'date-fns';
 
@@ -145,8 +146,10 @@ export default function StatisticsPage() {
     return () => document.removeEventListener('visibilitychange', onVisible);
   }, [user, period]);
 
-  async function loadAll(userId: string, p: Period) {
-    setLoading(true);
+  useAutoReload(() => { if (user) loadAll(user.id, period, true); }, !!user && !partner);
+
+  async function loadAll(userId: string, p: Period, quiet = false) {
+    if (!quiet) setLoading(true);
     try {
       const { start, end } = getRange(p);
       const [me, allUsers, all90] = await Promise.all([

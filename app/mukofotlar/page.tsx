@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Navigation from '@/components/Navigation';
 import { getSession, today, calcStreak, formatDisplayDate } from '@/lib/utils';
 import { getEntryByDate, getAllUsers, getAllEntries } from '@/lib/supabase';
+import { useAutoReload } from '@/lib/useAutoReload';
 import { getDuaChecklist } from '@/lib/local';
 import { MORNING_DUAS, EVENING_DUAS } from '@/lib/dua-data';
 import {
@@ -55,8 +56,8 @@ export default function MukofotlarPage() {
   const todayStr = today();
   const quote = getTodayQuote(todayStr);
 
-  const loadData = useCallback(async (userId: string) => {
-    setLoading(true);
+  const loadData = useCallback(async (userId: string, quiet = false) => {
+    if (!quiet) setLoading(true);
     setError('');
     try {
       const [myEnt, allUsers, myEnts] = await Promise.all([
@@ -101,6 +102,8 @@ export default function MukofotlarPage() {
 
     loadData(session.id);
   }, [router, loadData, todayStr]);
+
+  useAutoReload(() => { if (user) loadData(user.id, true); }, !!user && !partner);
 
   // After data loads, update cumulative award history in localStorage
   useEffect(() => {

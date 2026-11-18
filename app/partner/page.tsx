@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Navigation from '@/components/Navigation';
 import { getSession, today, formatDisplayDate, countPrayers, getMissedPrayers } from '@/lib/utils';
 import { getEntryByDate, getAllUsers, getAllEntries } from '@/lib/supabase';
+import { useAutoReload } from '@/lib/useAutoReload';
 import type { DailyEntry, User } from '@/lib/types';
 import { PRAYERS } from '@/lib/types';
 
@@ -24,8 +25,10 @@ export default function PartnerPage() {
     loadData(session.id);
   }, [router]);
 
-  async function loadData(myId: string) {
-    setLoading(true);
+  useAutoReload(() => { if (user) loadData(user.id, true); }, !!user && !partner);
+
+  async function loadData(myId: string, quiet = false) {
+    if (!quiet) setLoading(true);
     setError('');
     try {
       const allUsers = await getAllUsers();
