@@ -122,7 +122,7 @@ export default function MukofotlarPage() {
   if (error) {
     return (
       <div className="min-h-screen page-bg pb-28">
-        <div className="header-bg text-white px-4 pt-10 pb-16">
+        <div className="header-bg header-photo text-white px-4 pt-10 pb-16">
           <div className="max-w-md mx-auto"><h1 className="text-2xl font-black">🏆 Mukofotlar</h1></div>
         </div>
         <div className="max-w-md mx-auto px-4 -mt-8">
@@ -179,7 +179,7 @@ export default function MukofotlarPage() {
   return (
     <div className="min-h-screen pb-28 page-bg">
       {/* Header */}
-      <div className="header-bg text-white px-4 pt-10 pb-20">
+      <div className="header-bg header-photo text-white px-4 pt-10 pb-20">
         <div className="max-w-md mx-auto">
           <p className="text-green-400 text-xs uppercase tracking-widest mb-1">Bugun — {formatDisplayDate(todayStr)}</p>
           <h1 className="text-2xl font-black">🏆 Mukofotlar</h1>

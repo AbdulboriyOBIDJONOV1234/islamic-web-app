@@ -77,17 +77,42 @@ export default function DashboardPage() {
     if (!partner) return;
     setPartnerMandatoryDone(getMandatoryTaskState(String(partner.id)));
   }, [partner]);
-  // Poll partner data every 30 seconds — works on any device/browser
+  // Hamkorni va uning ma'lumotini avtomatik yangilab turadi.
+  // Hamkor hali qo'shilmagan bo'lsa ham, u ro'yxatdan o'tishi bilan o'zi paydo bo'ladi.
   useEffect(() => {
-    const interval = setInterval(async () => {
-      if (!partnerRef.current) return;
+    let stop = false;
+
+    async function refreshPartner() {
+      const session = getSession();
+      if (!session || stop) return;
       try {
-        const entry = await getEntryByDate(String(partnerRef.current.id), today());
-        setPartnerEntry(entry);
-        setPartnerLastRefresh(new Date());
-      } catch { /* silent — don't break UI on network error */ }
-    }, 30_000);
-    return () => clearInterval(interval);
+        let current = partnerRef.current;
+        if (!current) {
+          const allUsers = await getAllUsers();
+          current = allUsers.find((u) => String(u.id) !== String(session.id)) || null;
+          if (!current) return;
+          partnerRef.current = current;
+          setPartner(current);
+        }
+        const entry = await getEntryByDate(String(current.id), today());
+        if (!stop) {
+          setPartnerEntry(entry);
+          setPartnerLastRefresh(new Date());
+        }
+      } catch { /* silent — tarmoq xatosi UI ni buzmasin */ }
+    }
+
+    const interval = setInterval(refreshPartner, 10_000);
+    const onVisible = () => { if (document.visibilityState === 'visible') refreshPartner(); };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', refreshPartner);
+
+    return () => {
+      stop = true;
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', refreshPartner);
+    };
   }, []);
 
   function handleNiyatSave(text: string) {

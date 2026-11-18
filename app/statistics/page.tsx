@@ -203,7 +203,7 @@ export default function StatisticsPage() {
 
   return (
     <div className="min-h-screen pb-28 page-bg">
-      <div className="header-bg text-white px-4 pt-10 pb-16">
+      <div className="header-bg header-photo text-white px-4 pt-10 pb-16">
         <div className="max-w-md mx-auto">
           <h1 className="text-2xl font-black">📊 Statistika</h1>
           <p className="text-green-400 text-xs mt-1 uppercase tracking-widest">Umumiy ko&apos;rsatkichlar</p>

@@ -114,7 +114,7 @@ export default function QuranPage() {
   return (
     <div className="min-h-screen pb-28 page-bg">
       {/* Header */}
-      <div className="header-bg text-white px-4 pt-10 pb-16">
+      <div className="header-bg header-photo text-white px-4 pt-10 pb-16">
         <div className="max-w-md mx-auto">
           <h1 className="text-2xl font-black">📖 Diniy</h1>
           <p className="text-green-400 text-xs mt-1 uppercase tracking-widest">Qur&apos;on · Duolar · Maqsad</p>

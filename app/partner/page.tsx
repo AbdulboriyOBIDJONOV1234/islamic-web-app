@@ -60,7 +60,7 @@ export default function PartnerPage() {
   if (error) {
     return (
       <div className="min-h-screen page-bg pb-28">
-        <div className="header-bg text-white px-4 pt-10 pb-16">
+        <div className="header-bg header-photo text-white px-4 pt-10 pb-16">
           <div className="max-w-md mx-auto">
             <h1 className="text-2xl font-bold">👤 Hamkor</h1>
           </div>
@@ -81,7 +81,7 @@ export default function PartnerPage() {
   if (!partner) {
     return (
       <div className="min-h-screen page-bg pb-28">
-        <div className="header-bg text-white px-4 pt-10 pb-16">
+        <div className="header-bg header-photo text-white px-4 pt-10 pb-16">
           <div className="max-w-md mx-auto">
             <h1 className="text-2xl font-bold">👤 Hamkor</h1>
             <p className="text-green-400 text-xs mt-1 uppercase tracking-widest">Faqat ko&apos;rish</p>
@@ -106,7 +106,7 @@ export default function PartnerPage() {
 
   return (
     <div className="min-h-screen page-bg pb-28">
-      <div className="header-bg text-white px-4 pt-10 pb-16">
+      <div className="header-bg header-photo text-white px-4 pt-10 pb-16">
         <div className="max-w-md mx-auto">
           <p className="text-green-400 text-xs uppercase tracking-widest mb-1">Hamkoringiz</p>
           <h1 className="text-2xl font-black">{partner.name} 👤</h1>

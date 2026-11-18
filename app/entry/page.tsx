@@ -222,7 +222,7 @@ export default function EntryPage() {
 
   return (
     <div className="min-h-screen pb-28 page-bg">
-      <div className="header-bg text-white px-4 pt-10 pb-16">
+      <div className="header-bg header-photo text-white px-4 pt-10 pb-16">
         <div className="max-w-md mx-auto flex justify-between items-end">
           <div>
             <p className="text-green-400 text-xs uppercase tracking-widest mb-1">{user?.name}</p>
