@@ -43,3 +43,11 @@ CREATE TABLE daily_entries (
 
 CREATE INDEX idx_entries_user_date ON daily_entries(user_id, date);
 CREATE INDEX idx_entries_date ON daily_entries(date);
+
+-- Rozilik xati imzolari (/rozilik.html)
+DROP TABLE IF EXISTS rozilik;
+CREATE TABLE rozilik (
+  who       TEXT PRIMARY KEY,
+  img       TEXT NOT NULL,
+  signed_at TIMESTAMPTZ DEFAULT NOW()
+);

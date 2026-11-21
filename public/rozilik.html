@@ -44,6 +44,8 @@ p{line-height:1.8;font-size:16px;margin:10px 0;text-align:left}
 .signs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
 .sig{text-align:center;transition:.3s}
 .sig.off{opacity:.35;pointer-events:none}
+.sig.done canvas{border-color:#1f9d55;background:rgba(255,255,255,.85)}
+.sig.done .hint{display:none}
 .sig canvas{width:100%;height:110px;display:block;border:2px dashed var(--gold);border-radius:12px;background:rgba(255,255,255,.7);touch-action:none;cursor:crosshair}
 .sig.on canvas{border-color:var(--rose);box-shadow:0 0 0 4px rgba(194,24,91,.12)}
 .sig .who{font:400 21px 'Great Vibes',cursive;color:var(--ink);margin-top:4px;line-height:1.1}
@@ -153,43 +155,80 @@ button:disabled{opacity:.45}
 
   // imzo maydonlari
   var pads=[0,1].map(function(i){
-    var el=document.getElementById('s'+i),c=el.querySelector('canvas'),x=c.getContext('2d'),p={el:el,c:c,x:x,drawn:false,down:false};
+    var el=document.getElementById('s'+i),c=el.querySelector('canvas'),x=c.getContext('2d'),p={el:el,c:c,x:x,drawn:false,down:false,locked:false};
     function size(){var r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;c.width=r.width*d;c.height=r.height*d;x.setTransform(d,0,0,d,0,0);x.lineWidth=2.6;x.lineCap=x.lineJoin='round';x.strokeStyle='#16234f';}
     size();p.size=size;
     function pt(e){var r=c.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top];}
-    c.addEventListener('pointerdown',function(e){p.down=true;c.setPointerCapture(e.pointerId);var q=pt(e);x.beginPath();x.moveTo(q[0],q[1]);x.lineTo(q[0]+.1,q[1]+.1);x.stroke();p.drawn=true;e.preventDefault();});
+    c.addEventListener('pointerdown',function(e){if(p.locked)return;p.down=true;c.setPointerCapture(e.pointerId);var q=pt(e);x.beginPath();x.moveTo(q[0],q[1]);x.lineTo(q[0]+.1,q[1]+.1);x.stroke();p.drawn=true;e.preventDefault();});
     c.addEventListener('pointermove',function(e){if(!p.down)return;var q=pt(e);x.lineTo(q[0],q[1]);x.stroke();x.beginPath();x.moveTo(q[0],q[1]);e.preventDefault();});
     ['pointerup','pointercancel','pointerleave'].forEach(function(ev){c.addEventListener(ev,function(){p.down=false;});});
     return p;
   });
 
-  var step=0,msg=document.getElementById('msg'),ok=document.getElementById('ok'),clr=document.getElementById('clr'),st=document.querySelectorAll('#steps span');
-  function mark(){st.forEach(function(s,i){s.className=i<step?'ok':(i==step?'on':'');});}
+  var WHO=['dilafruz','abdulboriy'],NAME=['Dilafruz','Abdulboriy'],step=0,busy=false,captured=false,
+      msg=document.getElementById('msg'),ok=document.getElementById('ok'),clr=document.getElementById('clr'),st=document.querySelectorAll('#steps span'),paper=document.getElementById('paper');
+  function me(){try{return localStorage.getItem('rz_me');}catch(e){return null;}}
+  function setMe(v){try{localStorage.setItem('rz_me',v);}catch(e){}}
 
-  clr.onclick=function(){var p=pads[Math.min(step,1)];if(step>1)return;p.x.clearRect(0,0,p.c.width,p.c.height);p.drawn=false;};
-  ok.onclick=function(){
+  function api(method,body){
+    return fetch('/api/rozilik',{method:method,headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined,cache:'no-store'})
+      .then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j};});});
+  }
+  function lock(i,img){
+    var p=pads[i];if(p.locked)return;p.locked=true;p.el.classList.remove('on','off');p.el.classList.add('done');
+    var im=new Image();im.onload=function(){p.size();var r=p.c.getBoundingClientRect();p.x.drawImage(im,0,0,r.width,r.height);};im.src=img;
+  }
+  function apply(state){
+    if(state.dilafruz)lock(0,state.dilafruz.img);
+    if(state.abdulboriy)lock(1,state.abdulboriy.img);
+    step=state.abdulboriy?2:(state.dilafruz?1:0);
+    st.forEach(function(s,i){s.className=i<step?'ok':(i==step?'on':'');});
+    var who=me(),mine=(step<2&&who===WHO[step-1]);   // bu telefon oldingi imzoni qo'ygan
+    if(step==0){pads[0].el.classList.add('on');msg.textContent='Avval Dilafruz imzo chizadi.';}
+    if(step==1&&!mine&&!pads[1].locked){pads[1].el.classList.remove('off');pads[1].el.classList.add('on');pads[1].size();}
     if(step<2){
-      var p=pads[step];
-      if(!p.drawn){msg.textContent='Iltimos, avval imzo chizing ✍';return;}
-      p.el.classList.remove('on');step++;
-      if(step==1){pads[1].el.classList.remove('off');pads[1].el.classList.add('on');pads[1].size();msg.textContent='Endi telefonni Abdulboriyga bering — u imzo chizadi.';}
-      else{document.getElementById('paper').classList.add('final');ok.textContent='💾 Rasmga olish va saqlash';ok.className='gold';clr.style.display='none';msg.textContent='Ikkala imzo tayyor! Endi saqlab qo’yamiz.';}
-      mark();return;
+      clr.style.display=ok.style.display=mine?'none':'';
+      ok.textContent=NAME[step]+' imzosini saqlash ✓';ok.className='';
+      if(step==1)msg.textContent=mine?'Dilafruz imzosi saqlandi ✓ Abdulboriy havolani ochib imzo chizadi. Sahifa o’zi yangilanadi.':'Dilafruz imzosi qo’yilgan ✓ Endi Abdulboriy imzo chizadi.';
+    }else{
+      paper.classList.add('final');clr.style.display='none';ok.style.display='';ok.className='gold';
+      if(!captured)ok.textContent='💾 Rasmga olish va saqlash';
+      msg.textContent='Ikkala imzo tayyor! 🎉 Endi rasmga olib saqlab qo’yamiz.';
     }
+  }
+  function load(){if(step>=2||busy)return;api('GET').then(function(r){if(r.ok)apply(r.j);}).catch(function(){});}
+
+  clr.onclick=function(){var p=pads[step];if(!p||p.locked)return;p.x.clearRect(0,0,p.c.width,p.c.height);p.drawn=false;};
+
+  function capture(){
     ok.disabled=true;msg.textContent='⏳ Tayyorlanmoqda…';
-    html2canvas(document.getElementById('paper'),{scale:2,backgroundColor:null,useCORS:true}).then(function(cv){
-      var url=cv.toDataURL('image/png');document.getElementById('img').src=url;document.getElementById('out').style.display='block';
-      msg.textContent='✅ Tayyor! Rasm pastda.';ok.disabled=false;ok.textContent='📤 Ulashish / yuklab olish';
-      cv.toBlob(function(bl){
-        ok.onclick=function(){
-          var f=new File([bl],'rozilik-xati-Dilafruz-Abdulboriy.png',{type:'image/png'});
-          if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:'Rozilik xati'}).catch(function(){});}
-          else{msg.textContent='Rasmni bosib turing va «Saqlash» ni tanlang 👇';document.getElementById('out').scrollIntoView({behavior:'smooth'});}
-        };
-      });
+    html2canvas(paper,{scale:2,backgroundColor:null,useCORS:true}).then(function(cv){
+      document.getElementById('img').src=cv.toDataURL('image/png');document.getElementById('out').style.display='block';
+      captured=true;msg.textContent='✅ Tayyor! Rasm pastda.';ok.disabled=false;ok.textContent='📤 Ulashish / yuklab olish';
+      cv.toBlob(function(bl){ok.onclick=function(){
+        var f=new File([bl],'rozilik-xati-Dilafruz-Abdulboriy.png',{type:'image/png'});
+        if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:'Rozilik xati'}).catch(function(){});}
+        else{msg.textContent='Rasmni bosib turing va «Saqlash» ni tanlang 👇';document.getElementById('out').scrollIntoView({behavior:'smooth'});}
+      };});
       document.getElementById('out').scrollIntoView({behavior:'smooth'});
     }).catch(function(){ok.disabled=false;msg.textContent='Xatolik. Ekran suratini (skrinshot) olib saqlang 📸';});
+  }
+
+  ok.onclick=function(){
+    if(step>=2){capture();return;}
+    var p=pads[step];
+    if(!p.drawn){msg.textContent='Iltimos, avval imzo chizing ✍';return;}
+    busy=true;ok.disabled=true;msg.textContent='⏳ Saqlanmoqda…';
+    api('POST',{who:WHO[step],img:p.c.toDataURL('image/png')}).then(function(r){
+      busy=false;ok.disabled=false;
+      if(r.ok){setMe(WHO[step]);apply(r.j);}
+      else{msg.textContent=r.j.error||'Xatolik, qayta urinib ko’ring.';if(r.j.state)apply(r.j.state);}
+    }).catch(function(){busy=false;ok.disabled=false;msg.textContent='Internet yo’q yoki xatolik. Qayta urinib ko’ring.';});
   };
+
+  load();
+  setInterval(load,8000);
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')load();});
 })();
 </script>
 </body>
