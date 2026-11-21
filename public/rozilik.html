@@ -185,7 +185,7 @@ button:disabled{opacity:.45}
     st.forEach(function(s,i){s.className=i<step?'ok':(i==step?'on':'');});
     var who=me(),mine=(step<2&&who===WHO[step-1]);   // bu telefon oldingi imzoni qo'ygan
     if(step==0){pads[0].el.classList.add('on');msg.textContent='Avval Dilafruz imzo chizadi.';}
-    if(step==1&&!mine&&!pads[1].locked){pads[1].el.classList.remove('off');pads[1].el.classList.add('on');pads[1].size();}
+    if(step==1&&!mine&&!pads[1].locked){pads[1].el.classList.remove('off');pads[1].el.classList.add('on');if(!pads[1].ready){pads[1].size();pads[1].ready=true;}}
     if(step<2){
       clr.style.display=ok.style.display=mine?'none':'';
       ok.textContent=NAME[step]+' imzosini saqlash ✓';ok.className='';
@@ -196,7 +196,7 @@ button:disabled{opacity:.45}
       msg.textContent='Ikkala imzo tayyor! 🎉 Endi rasmga olib saqlab qo’yamiz.';
     }
   }
-  function load(){if(step>=2||busy)return;api('GET').then(function(r){if(r.ok)apply(r.j);}).catch(function(){});}
+  function load(){if(step>=2||busy||(pads[step]&&(pads[step].drawn||pads[step].down)))return;api('GET').then(function(r){if(r.ok)apply(r.j);}).catch(function(){});}
 
   clr.onclick=function(){var p=pads[step];if(!p||p.locked)return;p.x.clearRect(0,0,p.c.width,p.c.height);p.drawn=false;};
 
