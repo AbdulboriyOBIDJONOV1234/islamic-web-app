@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="dark">
 <title>Rozilik xati · Dilafruz & Abdulboriy</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E💍%3C/text%3E%3C/svg%3E">
-<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lora:ital,wght@0,400;0,600;1,400&family=Amiri&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Playfair+Display:wght@600;700&family=Amiri&display=swap" rel="stylesheet">
 <style>
 :root{--gold:#b8860b;--gold2:#e8c15a;--ink:#16234f;--paper:#fffaf0;--rose:#c2185b;--green:#0b3b20;
  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -35,8 +35,8 @@ h1{font:400 44px 'Great Vibes',cursive;margin:2px 0 0;color:var(--rose);line-hei
 .sub{letter-spacing:.3em;font-size:11px;color:var(--gold);text-transform:uppercase;margin-bottom:6px}
 .date{display:inline-block;margin:8px 0 14px;padding:5px 16px;border-radius:99px;border:1px solid var(--gold);font-size:13px;color:#6b4f12;background:rgba(232,193,90,.18)}
 .sep{color:var(--rose);text-align:center;letter-spacing:.5em;margin:10px 0;font-size:13px}
-p{line-height:1.75;font-size:15px;margin:10px 0;text-align:justify}
-.nm{font:400 27px 'Great Vibes',cursive;color:var(--ink);white-space:nowrap}
+p{line-height:1.8;font-size:16px;margin:10px 0;text-align:left}
+.nm{font:700 16.5px 'Playfair Display',Georgia,serif;color:var(--ink);border-bottom:1.5px dotted var(--gold)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
 .card{border:1px solid rgba(184,134,11,.5);border-radius:14px;padding:10px 12px;background:rgba(255,255,255,.55);font-size:13.5px;line-height:1.55}
 .card b{display:block;color:var(--green);margin-bottom:3px;font-size:13px}
@@ -62,7 +62,13 @@ button:disabled{opacity:.45}
 #msg{color:#fff;text-align:center;margin:12px 4px 0;font-size:14px;min-height:20px}
 #out{display:none;margin-top:16px;text-align:center;color:#fff}
 #out img{width:100%;border-radius:14px;box-shadow:0 20px 40px -10px #000;-webkit-touch-callout:default;user-select:auto}
-@media(max-width:480px){.two,.signs{grid-template-columns:1fr}h1{font-size:38px}.nm{font-size:23px}}
+@media(max-width:480px){.two,.signs{grid-template-columns:1fr}h1{font-size:38px}}
+.sec{display:flex;align-items:center;gap:10px;margin:20px 0 6px;font:700 13px 'Playfair Display',serif;letter-spacing:.18em;text-transform:uppercase;color:var(--green)}
+.sec:before,.sec:after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.vow{list-style:none;padding:0;margin:8px 0}
+.vow li{position:relative;padding:8px 8px 8px 30px;margin:6px 0;border-radius:12px;background:rgba(255,255,255,.55);border:1px solid rgba(184,134,11,.3);font-size:15px;line-height:1.55}
+.vow li:before{content:'♥';position:absolute;left:10px;top:8px;color:var(--rose)}
+.dua{text-align:center;margin:14px 0 4px}.dua .ar{font:24px/1.9 Amiri,serif;color:var(--green);direction:rtl}.dua em{font-size:14px;color:#6b4f12}
 @media(prefers-reduced-motion:reduce){.hearts i{animation:none}}
 </style>
 </head>
@@ -86,16 +92,31 @@ button:disabled{opacity:.45}
       <div class="date" id="date"></div>
     </div>
 
-    <p>Men, <span class="nm">Azimova Dilafruz Anvarjon qizi</span>, <span class="nm">Obidjonov Abdulboriy Abdulatifovich</span> Sizni <b>butun umrlikka</b> hayot yo’ldoshim, turmush o’rtog’im sifatida qabul qilishga o’z ixtiyorim bilan, hech kimning majburlashisiz, to’liq va ongli ravishda <b>rozilik bildiraman</b>.</p>
+    <div class="sec">Rozilik</div>
+    <p>Men, <span class="nm">Azimova Dilafruz Anvarjon qizi</span>, <span class="nm">Obidjonov Abdulboriy Abdulatifovich</span> Sizni <b>butun umrlikka</b> hayot yo’ldoshim, turmush o’rtog’im va hayot yo’lidagi hamrohim sifatida qabul qilishga — o’z ixtiyorim bilan, hech kimning bosimi va majburlashisiz, to’liq va ongli ravishda — <b>rozilik bildiraman</b>.</p>
+    <p>Bu qaror shoshilinch emas: u o’ylab, duo qilib va qalbimdagi sokin ishonch bilan qabul qilingan.</p>
 
+    <div class="sec">Ikki yo’lda — bir niyat</div>
     <div class="two">
-      <div class="card"><b>🕌 Diniy tomondan</b>Alloh taoloning roziligi va Rasululloh ﷺ sunnati yo’lida, shar’iy nikoh bilan, mahr va guvohlar ishtirokida.</div>
-      <div class="card"><b>📜 Dunyoviy tomondan</b>Qonunga muvofiq, FHDYo (ZAGS) orqali rasmiy nikoh bilan, ikki oilaning duosi va xabardorligida.</div>
+      <div class="card"><b>🕌 Diniy tomondan</b>Alloh taoloning roziligi va Rasululloh ﷺ sunnati yo’lida, shar’iy nikoh bilan: mahr, guvohlar va ota-onalar duosi ishtirokida.</div>
+      <div class="card"><b>📜 Dunyoviy tomondan</b>O’zbekiston qonunchiligiga muvofiq FHDYo (ZAGS) orqali rasmiy nikoh bilan: o’zaro hurmat, teng huquq va mas’uliyat asosida.</div>
     </div>
 
-    <p class="quote">Baxtda ham, sinovda ham, shodlikda ham, qiyinchilikda ham — yelkama-yelka, bir-birimizga suyanch va tayanch bo’lib yashashga niyat qilaman.</p>
+    <div class="sec">Va’dalarimiz</div>
+    <ul class="vow">
+      <li>Bir-birimizga doimo rostgo’y, halol va sadoqatli bo’lamiz.</li>
+      <li>Xafa bo’lsak ham, jim yurmay, gaplashib, kechirishni biladigan bo’lamiz.</li>
+      <li>Bir-birimizning oilamizni va ota-onamizni hurmat qilamiz.</li>
+      <li>Ibodatda, duoda va ilm yo’lida bir-birimizga yelkadosh bo’lamiz.</li>
+      <li>Baxtda shukr, sinovda sabr qilamiz va bir-birimizni hech qachon yolg’iz qoldirmaymiz.</li>
+    </ul>
+    <p class="quote">Shodlikda ham, qiyinchilikda ham — yelkama-yelka, bir-birimizga suyanch va tayanch bo’lib yashashga niyat qilaman.</p>
+
     <div class="sep">♥ ✦ ♥</div>
-    <p>Men, <span class="nm">Obidjonov Abdulboriy Abdulatifovich</span>, bu rozilikni minnatdorchilik bilan qabul qilaman. <span class="nm">Dilafruz Anvarjon qizini</span> umr bo’yi asrashga, hurmat qilishga, sadoqat va mehr bilan yashashga va’da beraman.</p>
+    <div class="sec">Qabul</div>
+    <p>Men, <span class="nm">Obidjonov Abdulboriy Abdulatifovich</span>, bu rozilikni minnatdorchilik va shukr bilan qabul qilaman. <span class="nm">Azimova Dilafruz Anvarjon qizini</span> umr bo’yi asrashga, hurmat qilishga, mehr va sadoqat bilan yashashga, uning har bir yaxshi niyatiga tayanch bo’lishga va’da beraman.</p>
+
+    <div class="dua"><div class="ar">رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ</div><em>«Robbimiz, bizga juftlarimiz va zurriyotlarimizdan ko’z quvonchi ato qil.»</em></div>
 
     <div class="signs">
       <div class="sig on" id="s0"><canvas></canvas><div class="who">Dilafruz</div><div class="role">Azimova Dilafruz Anvarjon qizi</div><div class="hint">✍ Shu yerga imzo chizing</div></div>
