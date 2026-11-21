@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Rozilik xati · Dilafruz & Abdulboriy</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E💍%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lora:ital,wght@0,400;0,600;1,400&family=Amiri&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#b8860b;--gold2:#e8c15a;--ink:#16234f;--paper:#fffaf0;--rose:#c2185b;--green:#0b3b20;
+ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Lora,Georgia,serif;color:#3a2e1c;
+ background:radial-gradient(ellipse at 50% 0,#14582f 0,#0b3b20 45%,#04140c 100%) fixed}
+.hearts{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.hearts i{position:absolute;bottom:-30px;font-style:normal;color:#ff6b9a;opacity:.0;animation:rise linear infinite}
+@keyframes rise{0%{transform:translateY(0) rotate(-10deg);opacity:0}15%{opacity:.55}100%{transform:translateY(-110vh) rotate(18deg);opacity:0}}
+.wrap{position:relative;z-index:1;max-width:620px;margin:0 auto;padding:16px 12px 40px}
+.steps{display:flex;gap:6px;margin:4px 0 14px;color:#fff;font:600 12px Lora,serif}
+.steps span{flex:1;text-align:center;padding:8px 4px;border-radius:12px;background:rgba(255,255,255,.12);opacity:.6;transition:.3s}
+.steps span.on{background:linear-gradient(180deg,#f0c040,#b8860b);color:#2a1a00;opacity:1;box-shadow:0 0 18px rgba(240,192,64,.5)}
+.steps span.ok{background:#1f9d55;opacity:1}
+#paper{position:relative;background:var(--paper);border-radius:20px;padding:26px 20px 22px;
+ box-shadow:0 30px 60px -20px #000,inset 0 0 0 2px var(--gold2),inset 0 0 0 7px var(--paper),inset 0 0 0 8px var(--gold);
+ background-image:radial-gradient(circle at 100% 0,rgba(232,193,90,.25),transparent 40%),radial-gradient(circle at 0 100%,rgba(194,24,91,.10),transparent 40%)}
+.corner{position:absolute;font-size:20px;color:var(--gold)}
+.tl{top:14px;left:16px}.tr{top:14px;right:16px}.bl{bottom:12px;left:16px}.br{bottom:12px;right:16px}
+.top{text-align:center}
+.bism{font:26px Amiri,serif;color:var(--gold);margin:2px 0 6px}
+.seal{width:84px;height:84px;margin:0 auto}
+#beads{display:block;margin:-4px auto 0;width:78%;max-width:300px}
+h1{font:400 44px 'Great Vibes',cursive;margin:2px 0 0;color:var(--rose);line-height:1.1}
+.sub{letter-spacing:.3em;font-size:11px;color:var(--gold);text-transform:uppercase;margin-bottom:6px}
+.date{display:inline-block;margin:8px 0 14px;padding:5px 16px;border-radius:99px;border:1px solid var(--gold);font-size:13px;color:#6b4f12;background:rgba(232,193,90,.18)}
+.sep{color:var(--rose);text-align:center;letter-spacing:.5em;margin:10px 0;font-size:13px}
+p{line-height:1.75;font-size:15px;margin:10px 0;text-align:justify}
+.nm{font:400 27px 'Great Vibes',cursive;color:var(--ink);white-space:nowrap}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.card{border:1px solid rgba(184,134,11,.5);border-radius:14px;padding:10px 12px;background:rgba(255,255,255,.55);font-size:13.5px;line-height:1.55}
+.card b{display:block;color:var(--green);margin-bottom:3px;font-size:13px}
+.quote{text-align:center;font-style:italic;color:#6b4f12}
+.signs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.sig{text-align:center;transition:.3s}
+.sig.off{opacity:.35;pointer-events:none}
+.sig canvas{width:100%;height:110px;display:block;border:2px dashed var(--gold);border-radius:12px;background:rgba(255,255,255,.7);touch-action:none;cursor:crosshair}
+.sig.on canvas{border-color:var(--rose);box-shadow:0 0 0 4px rgba(194,24,91,.12)}
+.sig .who{font:400 21px 'Great Vibes',cursive;color:var(--ink);margin-top:4px;line-height:1.1}
+.sig .role{font-size:11px;color:#8a6a1c}
+.sig .hint{font-size:11px;color:var(--rose)}
+.final .sig canvas{border:none;border-bottom:1.5px solid var(--gold);border-radius:0;background:transparent;box-shadow:none}
+.final .hint,.final .corner.ctl{display:none}
+.foot{text-align:center;margin-top:16px;font:400 24px 'Great Vibes',cursive;color:var(--rose)}
+#ctl{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+button{flex:1;min-width:130px;font:600 15px Lora,serif;border:0;border-radius:16px;padding:14px;color:#fff;cursor:pointer;
+ background:linear-gradient(180deg,#22a455,#137a3c);box-shadow:0 5px 0 #0a4a24;transition:.12s}
+button:active{transform:translateY(4px);box-shadow:0 1px 0 #0a4a24}
+button.ghost{background:rgba(255,255,255,.16);box-shadow:0 5px 0 rgba(0,0,0,.3)}
+button.gold{background:linear-gradient(180deg,#f0c040,#b8860b);color:#2a1a00;box-shadow:0 5px 0 #6b4f12}
+button:disabled{opacity:.45}
+#msg{color:#fff;text-align:center;margin:12px 4px 0;font-size:14px;min-height:20px}
+#out{display:none;margin-top:16px;text-align:center;color:#fff}
+#out img{width:100%;border-radius:14px;box-shadow:0 20px 40px -10px #000;-webkit-touch-callout:default;user-select:auto}
+@media(max-width:480px){.two,.signs{grid-template-columns:1fr}h1{font-size:38px}.nm{font-size:23px}}
+@media(prefers-reduced-motion:reduce){.hearts i{animation:none}}
+</style>
+</head>
+<body>
+<div class="hearts" id="hearts"></div>
+<div class="wrap">
+  <div class="steps" id="steps"><span class="on">1 · Dilafruz imzosi</span><span>2 · Abdulboriy imzosi</span><span>3 · Saqlash</span></div>
+
+  <div id="paper">
+    <span class="corner tl">❦</span><span class="corner tr">❦</span><span class="corner bl">♥</span><span class="corner br">♥</span>
+    <div class="top">
+      <div class="bism">بسم الله الرحمن الرحيم</div>
+      <svg class="seal" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6d77a"/><stop offset="1" stop-color="#a87408"/></linearGradient></defs>
+        <circle cx="50" cy="50" r="47" fill="#fffaf0" stroke="url(#g)" stroke-width="3"/><circle cx="50" cy="50" r="40" fill="none" stroke="url(#g)" stroke-width="1" stroke-dasharray="2 3"/>
+        <path d="M50 70C26 54 28 36 40 34c6-1 9 3 10 6 1-3 4-7 10-6 12 2 14 20-10 36z" fill="#c2185b"/>
+        <text x="50" y="25" text-anchor="middle" font-family="Great Vibes,cursive" font-size="17" fill="#a87408">D</text>
+        <text x="50" y="88" text-anchor="middle" font-family="Great Vibes,cursive" font-size="17" fill="#a87408">A</text></svg>
+      <svg id="beads" viewBox="0 0 300 70"></svg>
+      <h1>Rozilik xati</h1>
+      <div class="sub">Umrlik hamroh uchun</div>
+      <div class="date" id="date"></div>
+    </div>
+
+    <p>Men, <span class="nm">Azimova Dilafruz Anvarjon qizi</span>, <span class="nm">Obidjonov Abdulboriy Abdulatifovich</span> Sizni <b>butun umrlikka</b> hayot yo’ldoshim, turmush o’rtog’im sifatida qabul qilishga o’z ixtiyorim bilan, hech kimning majburlashisiz, to’liq va ongli ravishda <b>rozilik bildiraman</b>.</p>
+
+    <div class="two">
+      <div class="card"><b>🕌 Diniy tomondan</b>Alloh taoloning roziligi va Rasululloh ﷺ sunnati yo’lida, shar’iy nikoh bilan, mahr va guvohlar ishtirokida.</div>
+      <div class="card"><b>📜 Dunyoviy tomondan</b>Qonunga muvofiq, FHDYo (ZAGS) orqali rasmiy nikoh bilan, ikki oilaning duosi va xabardorligida.</div>
+    </div>
+
+    <p class="quote">Baxtda ham, sinovda ham, shodlikda ham, qiyinchilikda ham — yelkama-yelka, bir-birimizga suyanch va tayanch bo’lib yashashga niyat qilaman.</p>
+    <div class="sep">♥ ✦ ♥</div>
+    <p>Men, <span class="nm">Obidjonov Abdulboriy Abdulatifovich</span>, bu rozilikni minnatdorchilik bilan qabul qilaman. <span class="nm">Dilafruz Anvarjon qizini</span> umr bo’yi asrashga, hurmat qilishga, sadoqat va mehr bilan yashashga va’da beraman.</p>
+
+    <div class="signs">
+      <div class="sig on" id="s0"><canvas></canvas><div class="who">Dilafruz</div><div class="role">Azimova Dilafruz Anvarjon qizi</div><div class="hint">✍ Shu yerga imzo chizing</div></div>
+      <div class="sig off" id="s1"><canvas></canvas><div class="who">Abdulboriy</div><div class="role">Obidjonov Abdulboriy Abdulatifovich</div><div class="hint">✍ Shu yerga imzo chizing</div></div>
+    </div>
+    <div class="foot">Alloh bizni birga baxtli qilsin. Omin ♥</div>
+  </div>
+
+  <div id="ctl">
+    <button class="ghost" id="clr">🧹 Tozalash</button>
+    <button id="ok">Tasdiqlash ✓</button>
+  </div>
+  <div id="msg">Avval Dilafruz imzo chizadi.</div>
+  <div id="out"><p style="text-align:center">📲 Rasmni <b>bosib turing</b> va <b>«Rasmni saqlash»</b> ni tanlang.</p><img id="img" alt="Rozilik xati"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+(function(){
+  var M=['yanvar','fevral','mart','aprel','may','iyun','iyul','avgust','sentabr','oktabr','noyabr','dekabr'],
+      D=['yakshanba','dushanba','seshanba','chorshanba','payshanba','juma','shanba'], n=new Date();
+  document.getElementById('date').textContent='🗓 '+n.getDate()+'-'+M[n.getMonth()]+', '+n.getFullYear()+'-yil · '+D[n.getDay()];
+
+  // tasbeh (chotki)
+  var b=document.getElementById('beads'),h='<defs><radialGradient id="bg" cx=".35" cy=".3"><stop offset="0" stop-color="#fff3c0"/><stop offset="1" stop-color="#a87408"/></radialGradient></defs><path d="M20 8Q150 80 280 8" fill="none" stroke="#b8860b" stroke-width=".8"/>';
+  for(var i=0;i<=24;i++){var t=i/24,x=(1-t)*(1-t)*20+2*t*(1-t)*150+t*t*280,y=(1-t)*(1-t)*8+2*t*(1-t)*80+t*t*8;h+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="'+(i%8==0?5.2:3.8)+'" fill="url(#bg)"/>';}
+  h+='<path d="M150 44v14" stroke="#b8860b" stroke-width="1.2"/><ellipse cx="150" cy="47" rx="5" ry="6" fill="url(#bg)"/><path d="M146 58h8l2 10h-12z" fill="#c2185b"/>';
+  b.innerHTML=h;
+
+  // yurakchalar
+  var hs=document.getElementById('hearts'),k='';
+  for(var j=0;j<16;j++)k+='<i style="left:'+(Math.random()*100)+'%;font-size:'+(12+Math.random()*20)+'px;animation-duration:'+(9+Math.random()*10)+'s;animation-delay:-'+(Math.random()*14)+'s">'+(j%4==0?'✦':'♥')+'</i>';
+  hs.innerHTML=k;
+
+  // imzo maydonlari
+  var pads=[0,1].map(function(i){
+    var el=document.getElementById('s'+i),c=el.querySelector('canvas'),x=c.getContext('2d'),p={el:el,c:c,x:x,drawn:false,down:false};
+    function size(){var r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;c.width=r.width*d;c.height=r.height*d;x.setTransform(d,0,0,d,0,0);x.lineWidth=2.6;x.lineCap=x.lineJoin='round';x.strokeStyle='#16234f';}
+    size();p.size=size;
+    function pt(e){var r=c.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top];}
+    c.addEventListener('pointerdown',function(e){p.down=true;c.setPointerCapture(e.pointerId);var q=pt(e);x.beginPath();x.moveTo(q[0],q[1]);x.lineTo(q[0]+.1,q[1]+.1);x.stroke();p.drawn=true;e.preventDefault();});
+    c.addEventListener('pointermove',function(e){if(!p.down)return;var q=pt(e);x.lineTo(q[0],q[1]);x.stroke();x.beginPath();x.moveTo(q[0],q[1]);e.preventDefault();});
+    ['pointerup','pointercancel','pointerleave'].forEach(function(ev){c.addEventListener(ev,function(){p.down=false;});});
+    return p;
+  });
+
+  var step=0,msg=document.getElementById('msg'),ok=document.getElementById('ok'),clr=document.getElementById('clr'),st=document.querySelectorAll('#steps span');
+  function mark(){st.forEach(function(s,i){s.className=i<step?'ok':(i==step?'on':'');});}
+
+  clr.onclick=function(){var p=pads[Math.min(step,1)];if(step>1)return;p.x.clearRect(0,0,p.c.width,p.c.height);p.drawn=false;};
+  ok.onclick=function(){
+    if(step<2){
+      var p=pads[step];
+      if(!p.drawn){msg.textContent='Iltimos, avval imzo chizing ✍';return;}
+      p.el.classList.remove('on');step++;
+      if(step==1){pads[1].el.classList.remove('off');pads[1].el.classList.add('on');pads[1].size();msg.textContent='Endi telefonni Abdulboriyga bering — u imzo chizadi.';}
+      else{document.getElementById('paper').classList.add('final');ok.textContent='💾 Rasmga olish va saqlash';ok.className='gold';clr.style.display='none';msg.textContent='Ikkala imzo tayyor! Endi saqlab qo’yamiz.';}
+      mark();return;
+    }
+    ok.disabled=true;msg.textContent='⏳ Tayyorlanmoqda…';
+    html2canvas(document.getElementById('paper'),{scale:2,backgroundColor:null,useCORS:true}).then(function(cv){
+      var url=cv.toDataURL('image/png');document.getElementById('img').src=url;document.getElementById('out').style.display='block';
+      msg.textContent='✅ Tayyor! Rasm pastda.';ok.disabled=false;ok.textContent='📤 Ulashish / yuklab olish';
+      cv.toBlob(function(bl){
+        ok.onclick=function(){
+          var f=new File([bl],'rozilik-xati-Dilafruz-Abdulboriy.png',{type:'image/png'});
+          if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:'Rozilik xati'}).catch(function(){});}
+          else{msg.textContent='Rasmni bosib turing va «Saqlash» ni tanlang 👇';document.getElementById('out').scrollIntoView({behavior:'smooth'});}
+        };
+      });
+      document.getElementById('out').scrollIntoView({behavior:'smooth'});
+    }).catch(function(){ok.disabled=false;msg.textContent='Xatolik. Ekran suratini (skrinshot) olib saqlang 📸';});
+  };
+})();
+</script>
+</body>
+</html>

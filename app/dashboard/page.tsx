@@ -12,8 +12,7 @@ import { getEntryByDate, getAllUsers, getAllEntries } from '@/lib/supabase';
 import { getNiyat, setNiyat, getGoals, getNotifEnabled, setNotifEnabled } from '@/lib/local';
 import type { DailyEntry, User } from '@/lib/types';
 import { PRAYERS } from '@/lib/types';
-import { getTasksScore, getMandatoryTaskState, getMandatoryTasksForUser, toggleMandatoryTask } from '@/lib/tasks';
-import { getCustomTasks, addCustomTask, deleteCustomTask, customToMandatory, type CustomTask } from '@/lib/customTasks';
+import { getMandatoryScore, getMandatoryTaskState, getMandatoryTasksForUser, toggleMandatoryTask } from '@/lib/tasks';
 import { format } from 'date-fns';
 
 export default function DashboardPage() {
@@ -29,11 +28,6 @@ export default function DashboardPage() {
   const [notifOn, setNotifOn] = useState(false);
   const [myMandatoryDone, setMyMandatoryDone] = useState<Record<string, boolean>>({});
   const [partnerMandatoryDone, setPartnerMandatoryDone] = useState<Record<string, boolean>>({});
-  const [myCustomTasks, setMyCustomTasks] = useState<CustomTask[]>([]);
-  const [partnerCustomTasks, setPartnerCustomTasks] = useState<CustomTask[]>([]);
-  const [newTaskLabel, setNewTaskLabel] = useState('');
-  const [newTaskPoints, setNewTaskPoints] = useState(20);
-  const [taskBusy, setTaskBusy] = useState(false);
   const [showBadges, setShowBadges] = useState(false);
   const [showGoals, setShowGoals] = useState(false);
   const [yearMonth] = useState(() => format(new Date(), 'yyyy-MM'));
@@ -62,8 +56,6 @@ export default function DashboardPage() {
         setPartnerEntry(await getEntryByDate(String(partnerUser.id), todayStr));
         setPartnerLastRefresh(new Date());
       }
-      setMyCustomTasks(await getCustomTasks(userId));
-      if (partnerUser) setPartnerCustomTasks(await getCustomTasks(String(partnerUser.id)));
     } catch (err) {
       console.error('Dashboard load error:', err);
     } finally {
@@ -103,10 +95,8 @@ export default function DashboardPage() {
           setPartner(current);
         }
         const entry = await getEntryByDate(String(current.id), today());
-        const customs = await getCustomTasks(String(current.id));
         if (!stop) {
           setPartnerEntry(entry);
-          setPartnerCustomTasks(customs);
           setPartnerLastRefresh(new Date());
         }
       } catch { /* silent — tarmoq xatosi UI ni buzmasin */ }
@@ -124,33 +114,6 @@ export default function DashboardPage() {
       window.removeEventListener('focus', refreshPartner);
     };
   }, []);
-
-  async function handleAddCustomTask() {
-    if (!user) return;
-    const label = newTaskLabel.trim();
-    if (!label) return;
-    setTaskBusy(true);
-    try {
-      const created = await addCustomTask(user.id, label, newTaskPoints);
-      setMyCustomTasks((prev) => [...prev, created]);
-      setNewTaskLabel('');
-    } catch {
-      alert('Vazifani qo\'shib bo\'lmadi. Qayta urinib ko\'ring.');
-    } finally {
-      setTaskBusy(false);
-    }
-  }
-
-  async function handleDeleteCustomTask(id: string) {
-    if (!user) return;
-    if (!confirm('Bu vazifa o\'chirilsinmi?')) return;
-    try {
-      await deleteCustomTask(user.id, id);
-      setMyCustomTasks((prev) => prev.filter((t) => t.id !== id));
-    } catch {
-      alert('O\'chirib bo\'lmadi. Qayta urinib ko\'ring.');
-    }
-  }
 
   function handleNiyatSave(text: string) {
     if (!user) return;
@@ -244,16 +207,12 @@ export default function DashboardPage() {
   const badges = calcBadges(allMyEntries, streak);
   const earnedBadges = badges.filter((b) => b.earned);
 
-  const myMandatoryTasks = user
-    ? [...getMandatoryTasksForUser(user.name), ...myCustomTasks.map((t) => customToMandatory(t, user.name))]
-    : [];
-  const partnerMandatoryTasks = partner
-    ? [...getMandatoryTasksForUser(partner.name), ...partnerCustomTasks.map((t) => customToMandatory(t, partner.name))]
-    : [];
+  const myMandatoryTasks = user ? getMandatoryTasksForUser(user.name) : [];
+  const partnerMandatoryTasks = partner ? getMandatoryTasksForUser(partner.name) : [];
   const myMandatoryDoneCount = myMandatoryTasks.filter((task) => myMandatoryDone[task.id]).length;
   const partnerMandatoryDoneCount = partnerMandatoryTasks.filter((task) => partnerMandatoryDone[task.id]).length;
-  const myMandatoryScore = getTasksScore(myMandatoryTasks, myMandatoryDone);
-  const partnerMandatoryScore = getTasksScore(partnerMandatoryTasks, partnerMandatoryDone);
+  const myMandatoryScore = user ? getMandatoryScore(user.name, myMandatoryDone) : 0;
+  const partnerMandatoryScore = partner ? getMandatoryScore(partner.name, partnerMandatoryDone) : 0;
 
   const goals = getGoals(user?.id || '', yearMonth);
   const monthDhikr = allMyEntries
@@ -323,58 +282,6 @@ export default function DashboardPage() {
             onToggle={handleMandatoryToggle}
             canToggle={Boolean(user)}
           />
-
-          <div className="mt-3 rounded-xl border border-dashed border-green-300 bg-green-50/40 p-3">
-            <p className="text-xs font-bold text-green-700 mb-2">➕ O&apos;z vazifangizni qo&apos;shing</p>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={newTaskLabel}
-                onChange={(e) => setNewTaskLabel(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleAddCustomTask(); }}
-                maxLength={80}
-                placeholder="Masalan: Arab tili — speaking"
-                className="flex-1 min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 outline-none focus:border-green-400"
-              />
-              <select
-                value={newTaskPoints}
-                onChange={(e) => setNewTaskPoints(Number(e.target.value))}
-                className="rounded-lg border border-gray-200 bg-white px-2 py-2 text-sm text-gray-800"
-                aria-label="Ball"
-              >
-                {[10, 15, 20, 25, 30].map((n) => (
-                  <option key={n} value={n}>+{n}</option>
-                ))}
-              </select>
-              <button
-                type="button"
-                onClick={handleAddCustomTask}
-                disabled={taskBusy || !newTaskLabel.trim()}
-                className="rounded-lg bg-green-600 px-3 py-2 text-sm font-bold text-white disabled:opacity-40"
-              >
-                Qo&apos;sh
-              </button>
-            </div>
-
-            {myCustomTasks.length > 0 && (
-              <div className="mt-3 space-y-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400">Sizning vazifalaringiz</p>
-                {myCustomTasks.map((t) => (
-                  <div key={t.id} className="flex items-center justify-between rounded-lg bg-white border border-gray-100 px-3 py-1.5">
-                    <span className="text-xs text-gray-700 truncate pr-2">{t.label} <span className="text-amber-600 font-bold">+{t.points}</span></span>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteCustomTask(t.id)}
-                      className="text-xs font-bold text-red-400 hover:text-red-600"
-                      aria-label="O'chirish"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
 
           {partner && (
             <div className="mt-4 border-t border-gray-100 pt-4">

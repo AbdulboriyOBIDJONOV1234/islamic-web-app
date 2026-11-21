@@ -8,11 +8,11 @@ export async function GET(req: NextRequest) {
   const name = req.nextUrl.searchParams.get('name');
 
   if (name) {
-    const rows = await sql`SELECT id, name, created_at FROM users WHERE LOWER(name) = LOWER(${name}) LIMIT 1` as Row[];
+    const rows = await sql`SELECT * FROM users WHERE LOWER(name) = LOWER(${name}) LIMIT 1` as Row[];
     return NextResponse.json(rows[0] || null);
   }
 
-  const rows = await sql`SELECT id, name, created_at FROM users ORDER BY created_at ASC` as Row[];
+  const rows = await sql`SELECT * FROM users ORDER BY created_at ASC` as Row[];
   return NextResponse.json(rows);
 }
 
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
   const sql = getDb();
   const { name } = await req.json();
   const rows = await sql`
-    INSERT INTO users (name) VALUES (${name.trim()}) RETURNING id, name, created_at
+    INSERT INTO users (name) VALUES (${name.trim()}) RETURNING *
   ` as Row[];
   return NextResponse.json(rows[0]);
 }
